@@ -141,7 +141,6 @@ inversa para pasar de DOS a UNIX.
 
 
 \section{Casos de prueba}
-
 En la siguiente secci\'on se detallaran los distintos archivos utilizados para probar el funcionamiento del
 programa. Para ello se adjuntaran imagenes de corridas de los mismos; en donde se ense\~{n}a el dump del 
 archivo origen, en formato ASCII con barra invertidas para los caracteres de escape, y luego el del 
@@ -152,42 +151,100 @@ archivo destino.
     Invocaci\'on del programa con par\'ametros -i y -o definidos:
     \begin{itemize}
       \item \textbf{dos2unix}
+      \newline	
+      \includegraphics[width=10cm, viewport=0 0 901 246]{../Informe/Imagenes/prueba1-invocacion-dos2unix.png}
+      \newline
+      En la figura se muestra el contenido de los archivos de entrada y salida. Como es de esperarse, la unica diferencia
+      se encuentra en los caracteres de fin de linea, `\textbackslash r\textbackslash n' en el de entrada, y `\textbackslash n' en el de salida.
       \item \textbf{unix2dos}
+      \newline
+      \includegraphics[width=10cm, viewport=0 0 899 246]{../Informe/Imagenes/prueba1-invocacion-unix2dos.png}
+      \newline
+      En este caso, el pasaje es inverso al anterior: se pasa de `\textbackslash n' a `\textbackslash r\textbackslash n'.	
+      \newline
+      Nota: En las siguientes pruebas de esta secci\'on se omitira mostrar el contenido del archivo de entrada, ya que es el mismo
+      para las siguientes pruebas. En secciones posteriores se utilizar\'an distintos archivos.
     \end{itemize}
 
     \subsubsection{Prueba 2}
-    Invocaci\'on del programa con par\'ametros -i definido:
+    Invocaci\'on del programa con par\'ametros -i definido (se utiliza un archivo de entrada y se muestra
+    la salida por salida est\'andar):
     \begin{itemize}
       \item \textbf{dos2unix}
+      \newline
+      \includegraphics[width=10cm, viewport=0 0 902 170]{../Informe/Imagenes/prueba2-invocacion-dos2unix.png}
+      \newline	
+      En la figura puede verse como al no utilizar la opci\'on `-o' se muestra el archivo de salida por
+      salida est\'andar de manera correcta.	
       \item \textbf{unix2dos}
+      \newline 
+      \includegraphics[width=10cm, viewport=0 0 898 167]{../Informe/Imagenes/prueba2-invocacion-unix2dos.png}		
+      \newline
+      Como en el caso `dos2unix', se muestra el archivo de salida por salida est\'andar.
     \end{itemize}
-  
+
     \subsubsection{Prueba 3}
     Invocaci\'on del programa con par\'ametros -i igual a ``-'' (flujo est\'andar stdin):
       \begin{itemize}
       \item \textbf{dos2unix}
+      \newline 
+      %\ falta
+      %\includegraphics[width=10cm, bb=0 0 901 246]{../Informe/Imagenes/prueba3-invocacion-dos2unix.png}
+      %\newline	
+      En este caso, se explicita el uso de la entrada est\'andar. La salida es almacenada en un archivo
+      de salida. 
       \item \textbf{unix2dos}
-      \end{itemize}
+      \newline 
+      \includegraphics[width=10cm, viewport=0 0 897 181]{../Informe/Imagenes/prueba3-invocacion-unix2dos.png}	
+      \newline
+      asdasdasd... COMENTAR.
+    \end{itemize}
 
     \subsubsection{Prueba 4}
     Invocaci\'on del programa con par\'ametros -i definido y -o igual a ``-'' (flujo est\'andar stdout):
       \begin{itemize}
       \item \textbf{dos2unix}
+      \newline
+      \includegraphics[width=10cm, viewport=0 0 897 199]{../Informe/Imagenes/prueba4-invocacion-dos2unix.png}
+      \newline	
+      Como se muestra en la figura, se explicita el uso de la entrada est\'andar utilizando como opciones 
+      `-i - -o -'.
       \item \textbf{unix2dos}
+      \newline
+      \includegraphics[width=10cm, viewport=0 0 898 177]{../Informe/Imagenes/prueba4-invocacion-unix2dos.png}	
+      \newline
+      asdasdasd... COMENTAR.
       \end{itemize}
 
     \subsubsection{Prueba 5}
-    Invocaci\'on del programa con par\'ametros -i y -o indefinido (flujo est\'andares implicitos):
+    Invocaci\'on del programa con -o indefinido:
       \begin{itemize}
       \item \textbf{dos2unix}
+      \newline
+      %\ falta
+      %\includegraphics[width=10cm, bb=0 0 901 246]{prueba5-invocacion-dos2unix.png}
+      %\newline	
+      Como se muestra en la figura, se utiliza la entrada y salida est\'andar.
       \item \textbf{unix2dos}
+      \newline
+      \includegraphics[width=10cm, viewport=0 0 895 152]{../Informe/Imagenes/prueba5-invocacion-unix2dos.png}	
+      \newline
+      asdasdasd... COMENTAR.
       \end{itemize}
+
 
     \subsubsection{Prueba 6}
     Invocaci\'on del programa con entrada por stdin y salida por stdout:
       \begin{itemize}
       \item \textbf{dos2unix}
+      %\newline
+      %\ falta
+      %\includegraphics[width=10cm, bb=0 0 901 246]{../Informe/Imagenes/prueba6-invocacion-dos2unix.png}
       \item \textbf{unix2dos}
+      \newline
+      \includegraphics[width=8cm, viewport=0 0 904 174]{../Informe/Imagenes/prueba6-invocacion-unix2dos.png}	      
+      \newline
+      asdasdasd... COMENTAR.
       \end{itemize}
 
   \subsection{Distintos archivos de prueba}
@@ -195,29 +252,66 @@ archivo destino.
     Utilizaci\'on de un archivo de origen vac\'io:
       \begin{itemize}
       \item \textbf{dos2unix}
+      \newline
+      \includegraphics[width=8cm, viewport=0 0 896 156]{../Informe/Imagenes/prueba1-archivo-dos2unix.png}
+      \newline	
+      Al pasar un archivo vacio como entrada se crea un archivo vacio, como es de esperarse.
       \item \textbf{unix2dos}
+      \newline
+      \includegraphics[width=8cm, viewport=0 0 898 153]{../Informe/Imagenes/prueba1-archivo-unix2dos.png}	
+      \newline
+      asdasdasd... COMENTAR.
       \end{itemize}
 
     \subsubsection{Prueba 2}
-    Utilizaci\'on de un archivo de un archivo simple:
+    Utilizaci\'on de un archivo inexistente:
       \begin{itemize}
       \item \textbf{dos2unix}
+      \newline
+      \includegraphics[width=8cm, viewport=0 0 1168 147]{../Informe/Imagenes/prueba2-archivo-dos2unix.png}
+      \newline	
+      asdasdasd... COMENTAR.
       \item \textbf{unix2dos}
+%error
+%      \newline
+%      \includegraphics[width=8cm, viewport=0 895 128]{../Informe/Imagenes/prueba2-archivo-unix2dos.png}	      
+      \newline
+      asdasdasd... COMENTAR.
       \end{itemize}
 
     \subsubsection{Prueba 3}
-    Utilizaci\'on de un archivo de un archivo complejo:
+    Utilizaci\'on de un archivo complejo:
       \begin{itemize}
       \item \textbf{dos2unix}
+      \newline
+      \includegraphics[width=10cm, viewport=0 0 844 808]{../Informe/Imagenes/prueba3-archivo-dos2unix1.png}
+      \newline
+      \includegraphics[width=10cm, viewport=0 0 839 798]{../Informe/Imagenes/prueba3-archivo-dos2unix2.png}
+      \newline
+      asdasdasd... COMENTAR.
       \item \textbf{unix2dos}
+      \newline
+      \includegraphics[width=10cm, viewport=0 0 837 798]{../Informe/Imagenes/prueba3-archivo-unix2dos1.png}
+      \newline
+      \includegraphics[width=10cm, viewport=0 0 841 799]{../Informe/Imagenes/prueba3-archivo-unix2dos2.png}		
+      \newline
+      asdasdasd... COMENTAR.
       \end{itemize}
-
     \subsubsection{Prueba 4}
     Conversi\'on de un archivo de un formato al otro, y el resultado convertirlo al formato original.
       \begin{itemize}
       \item \textbf{dos2unix}
+      \newline
+      \includegraphics[width=10cm, viewport=0 0 842 237]{../Informe/Imagenes/prueba4-archivo-dos2unix.png}
+      \newline	
+      asdasdasd... COMENTAR.
       \item \textbf{unix2dos}
+      \newline
+      \includegraphics[width=10cm, viewport=0 0 838 328]{../Informe/Imagenes/prueba4-archivo-unix2dos.png}	
+      \newline
+      asdasdasd... COMENTAR.
       \end{itemize}
+
 \section{Conclusiones}
 Completar...
 
