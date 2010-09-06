@@ -7,8 +7,13 @@
 \usepackage{appendix}
 \usepackage{pdfpages}
 \usepackage{array}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
 
 \begin{document}
+
+\lhead{\fancyplain{}{Organizaci\'on de computadoras 66.20 - Turno Martes}}
+\rhead{\fancyplain{}{Tp 0}}
 
 \setcounter{page}{2}
 
@@ -33,22 +38,22 @@ Para la resoluci\'on del ejercicio se realiz\'o una funci\'on llamada
 plataformas UNIX. Para poder lograr la conversi\'on se tuvieron que cambiar los caracteres
 \textbackslash n por \textbackslash r\textbackslash n para convertir el formato de archivo de UNIX a DOS y la conversi\'on 
 inversa para pasar de DOS a UNIX. 
-\newline
-Para ejecutar el programa, el comando a utilizar es: ./[nombre de ejecutable] -i [ruta de archivo origen] -o [ruta de archivo destino]
-En caso de que no se utilicen las opciones ``i'' (archivo de entrada) y ``o'' (archivo de salida) el programa
-utiliza la entrada estandar (stdin) y salida estandar (stdout).
 
   \subsection{Funcion ``main''}
-  En ambos programas se llama a la funci\'on ``parser'' detallada anteriormente, y se retorna el valor de retorno de la misma.
-  Lo \'unico que los diferencia es que en ``unix2dos'' el valor de ``finLinea'' toma el valor de \textbackslash n y finLineaNuevo \textbackslash r\textbackslash n, y en ``dos2unix''
-  se intercambian esos valores.
+  En ambos programas se llama a la funci\'on ``parser'' detallada a continuaci\'on, y se retorna el valor de 
+  retorno de la misma. Lo \'unico que los diferencia es que en ``unix2dos'' el valor de ``finLinea'' toma el 
+  valor de \textbackslash n y finLineaNuevo \textbackslash r\textbackslash n, y en ``dos2unix'' se 
+  intercambian esos valores.
 
   \subsection{Funcion ``parser''}
   Esta funci\'on se encarga de obtener las opciones de ejecuci\'on del programa utilizando la funcion ``getopt'' y, en base
   a eso, llamar a la funci\'on ``traducirFormato'', pasandole los parametros correspondientes.
   \newline
   Para la captura de los par\'ametros opcionales que pueden utilizarse al 
-  llamar el programa se decidi\'o utilizar la funci\'on {\bf getopt(int argc,char\*\* argv,char\* options)}. 
+  llamar el programa se decidi\'o utilizar la funci\'on:
+  \newline
+  {\bf getopt(int argc,char\*\* argv,char\* options)}. 
+  \newline
   Esta decisi\'on se tomo con el fin de simplificar el c\'odigo necesario para la resoluci\'on del parseo de los
   argumentos; dado que, de este modo, se evita generar c\'odigo que tenga
   en cuenta todas las combinaciones posibles de los mismos. As\'i como
@@ -94,26 +99,46 @@ utiliza la entrada estandar (stdin) y salida estandar (stdout).
   \end{itemize}
 
 \section{Compilaci\'on en NetBSD}
-  Para poder compilar desde NetBSD y obtener el c\'odigo MIPS generado por el compilador, se debe ejecutar:
+  \subsection{Generando c\'odigo binario}
+    Para poder compilar desde NetBSD y obtener el c\'odigo binario, se debe ejecutar:
+    \newline
+    {\bf guestOS\# gcc -o unix2dos unix2dos.c} \newline
+    {\bf guestOS\# gcc -o dos2unix dos2unix.c}
+    \newline
+    En ambos casos, se decidi\'o utilizar como nombre archivo de salida (opci\'on -o) el mismo del archivo 
+    del c\'odigo fuente.
+    
+  \subsection{Generando c\'odigo assembly}
+    Para poder compilar desde NetBSD y obtener el c\'odigo MIPS generado por el compilador, se debe ejecutar:
+    \newline
+    {\bf guestOS\# gcc -Wall -O0 -S -mrnames unix2dos.c} 
+    \newline
+    {\bf guestOS\# gcc -Wall -O0 -S -mrnames dos2unix.c}
+    \newline
+    Donde:
+    \begin{itemize}
+      \item {\bf-S:} detiene al compilador luego de generar el assembly.
+      \item {\bf-mrnames} (solo para MIPS): indica al compilador que genere la salida utilizando nombre de 
+	registro en lugar de n\'umero de registro.
+      \item {\bf-O0:} No aplica optimizaciones.
+    \end{itemize}
+    A continuaci\'on el c\'odigo assembly:
+    \subsubsection{unix2dos}
+      \lstset{numbers=left, frame=single, breaklines=true}
+      \lstinputlisting{../Codigo/dos2unix.s}
+    \subsubsection{dos2unix}
+      \lstset{numbers=left, frame=single, breaklines=true}
+      \lstinputlisting{../Codigo/unix2dos.s}
+
+\section{Ejecutando los programas en NetBSD}
+  Para ejecutar el programa, el comando a utilizar es:
   \newline
-  {\bf guestOS\# gcc -Wall -O0 -S -mrnames unix2dos.c} 
+  {\bf./[nombre de ejecutable] -i [ruta de archivo origen] -o [ruta de archivo destino]}
   \newline
-  {\bf guestOS\# gcc -Wall -O0 -S -mrnames dos2unix.c}
-  \newline
-  Donde:
-  \begin{itemize}
-  \item {\bf-S:} detiene al compilador luego de generar el assembly.
-  \item {\bf-mrnames} (solo para MIPS): indica al compilador que genere la salida utilizando nombre de 
-    registro en lugar de n\'umero de registro.
-  \item {\bf-O0:} No aplica optimizaciones.
-  \end{itemize}
-  A continuaci\'on el c\'odigo assembly:
-  \subsection{unix2dos}
-    \lstset{numbers=left, frame=single, breaklines=true}
-    \lstinputlisting{../Codigo/dos2unix.s}
-  \subsection{dos2unix}
-    \lstset{numbers=left, frame=single, breaklines=true}
-    \lstinputlisting{../Codigo/unix2dos.s}
+  En caso de que no se utilicen las opciones {\bf ``-i''} (archivo de entrada) y {\bf ``-o''} (archivo de salida) el 
+  programa utiliza la entrada estandar (stdin) y salida estandar (stdout). Para ver ejemplos, observar 
+  secci\'on de casos de prueba.
+
 
 \section{Casos de prueba}
 
