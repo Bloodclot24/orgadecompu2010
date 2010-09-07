@@ -196,6 +196,8 @@ archivo destino.
       \newline 
       \includegraphics[width=10cm, viewport=0 0 897 181]{../Informe/Imagenes/prueba3-invocacion-unix2dos.png}	
       \newline
+      Como en el caso, `dos2unix', se explicita el uso de la entrada est\'andar, almacenando la salida en un archivo espec\'ificado por par\'ametro.
+      Se muestra el resultado obtenido en el archivo de salida, utilizando od.
       \textcolor{red}{COMENTAR}
     \end{itemize}
 
@@ -206,12 +208,14 @@ archivo destino.
       \newline
       \includegraphics[width=10cm, viewport=0 0 897 199]{../Informe/Imagenes/prueba4-invocacion-dos2unix.png}
       \newline	
-      Como se muestra en la figura, se explicita el uso de la entrada est\'andar utilizando como opciones 
-      `-i - -o -'.
+      Como se muestra en la figura, se explicita el uso de la salida est\'andar y tomando como entrada un archivo predefinido utilizando como opciones 
+      `-i archivoInput -o -'.
       \item \textbf{unix2dos}
       \newline
       \includegraphics[width=10cm, viewport=0 0 898 177]{../Informe/Imagenes/prueba4-invocacion-unix2dos.png}	
       \newline
+      Como en el caso `dos2unix', se explicita el uso de la salida est\'andar tomando como entrada un archivo predefinido e invocando al programa
+      utilizando como opciones `-i archivoInput -o -'.
       \textcolor{red}{COMENTAR}
       \end{itemize}
 
@@ -223,11 +227,14 @@ archivo destino.
       %\ falta
       %\includegraphics[width=10cm, bb=0 0 901 246]{prueba5-invocacion-dos2unix.png}
       %\newline	
-      Como se muestra en la figura, se utiliza la entrada y salida est\'andar.
+      Como se muestra en la figura, se utiliza la entrada y salida est\'andar. Se invoca al programa con las opciones
+      ` -i - -o -'.
       \item \textbf{unix2dos}
       \newline
       \includegraphics[width=10cm, viewport=0 0 895 152]{../Informe/Imagenes/prueba5-invocacion-unix2dos.png}	
       \newline
+      Como en el caso `dos2unix', se utiliza la entrada y la salida est\'andar. Se invoca al programa con las opciones
+      ` -i - -o -'.
       \textcolor{red}{COMENTAR}
       \end{itemize}
 
@@ -239,10 +246,15 @@ archivo destino.
       %\newline
       %\ falta
       %\includegraphics[width=10cm, bb=0 0 901 246]{../Informe/Imagenes/prueba6-invocacion-dos2unix.png}
+      \newline
+      Como se muestra en la figura, se invoca al programa sin ning\'un par\'ametro y el mismo toma como comportamiento por defecto
+      la entrada por entrada est\'andar y la salida por salida est\'andar.
       \item \textbf{unix2dos}
       \newline
       \includegraphics[width=8cm, viewport=0 0 904 174]{../Informe/Imagenes/prueba6-invocacion-unix2dos.png}	      
       \newline
+      Como en el caso de `dos2unix', se invoca al programa sin ning\'un par\'ametro y el programa toma su comportamiento
+      por defecto.
       \textcolor{red}{COMENTAR}
       \end{itemize}
 
