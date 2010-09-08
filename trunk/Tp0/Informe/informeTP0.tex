@@ -287,11 +287,12 @@ archivo destino.
       \newline
       \includegraphics[width=8cm, viewport=0 0 896 156]{../Informe/Imagenes/prueba1-archivo-dos2unix.png}
       \newline	
-      Al pasar un archivo vacio como entrada se crea un archivo vacio, como es de esperarse.
+      Al pasar un archivo vacio como entrada se crea un archivo vac\'io, como es de esperarse.
       \item \textbf{unix2dos}
       \newline
       \includegraphics[width=8cm, viewport=0 0 898 153]{../Informe/Imagenes/prueba1-archivo-unix2dos.png}	
       \newline
+      Al igual que en el caso de `dos2unix' al pasar un archivo vac\'io como entrada, se genera un archivo vac\'o de salida.
       \textcolor{red}{COMENTAR}
       \end{itemize}
 
@@ -301,12 +302,16 @@ archivo destino.
       \item \textbf{dos2unix}
       \newline
       \includegraphics[width=8cm, viewport=0 0 1168 147]{../Informe/Imagenes/prueba2-archivo-dos2unix.png}
-      \newline	
+      \newline
+      Al invocar un programa con un archivo de entrada inexistente, el mismo devuelve por stderr el mensaje de error correspondiente.
+      En este caso: {\bf ``Archivo de or\'igen no existe.''}.
       \textcolor{red}{COMENTAR}
       \item \textbf{unix2dos}
       \newline
       \includegraphics[width=8cm, viewport=0 0 895 128]{../Informe/Imagenes/prueba2-archivo-unix2dos.png}
       \newline
+      Al igual que en el caso de `dos2unix', al invocar el programa con un archivo de entrada inexistente, devuelve un mensaje por stderr
+      informando dicho error.
       \textcolor{red}{COMENTAR}
       \end{itemize}
 
@@ -319,6 +324,9 @@ archivo destino.
       \newline
       \includegraphics[width=10cm, viewport=0 0 839 798]{../Informe/Imagenes/prueba3-archivo-dos2unix2.png}
       \newline
+      Al ingresar un archivo complejo como entrada, y ejecutar el programa, se muestra utilizando {\bf od} la salida
+      del archivo de entrada original y el resultado obtenido como salida del mismo. Como puede observarse al comparar
+      ambos archivos, la salida es la esperada.
       \textcolor{red}{COMENTAR}
       \item \textbf{unix2dos}
       \newline
@@ -326,6 +334,8 @@ archivo destino.
       \newline
       \includegraphics[width=10cm, viewport=0 0 841 799]{../Informe/Imagenes/prueba3-archivo-unix2dos2.png}		
       \newline
+      Al realizar la misma prueba que en el caso de `dos2unix', e ingresar un archivo complejo como entrada, se muestra
+      ambos archivos (el de entrada original y el de salida, luego de la conversi\'on); obteni\'endose el resultado esperado.
       \textcolor{red}{COMENTAR}
       \end{itemize}
     \subsubsection{Prueba 4}
@@ -335,7 +345,7 @@ archivo destino.
       \newline
       \includegraphics[width=10cm, viewport=0 0 842 328]{../Informe/Imagenes/prueba4-archivo-dos2unix.png}	
       \newline
-      \textcolor{red}{COMENTAR}
+     \ textcolor{red}{COMENTAR}
       \item \textbf{unix2dos}
       \newline
       \includegraphics[width=10cm, viewport=0 0 838 328]{../Informe/Imagenes/prueba4-archivo-unix2dos.png}	
