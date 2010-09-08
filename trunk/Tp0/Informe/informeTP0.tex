@@ -219,7 +219,7 @@ archivo destino.
       \newline
       Como en el caso, `dos2unix', se explicita el uso de la entrada est\'andar, almacenando la salida en un archivo espec\'ificado por par\'ametro.
       Se muestra el resultado obtenido en el archivo de salida, utilizando od.
-      \textcolor{red}{COMENTAR}
+      
     \end{itemize}
 
     \subsubsection{Prueba 4}
@@ -237,7 +237,7 @@ archivo destino.
       \newline
       Como en el caso `dos2unix', se explicita el uso de la salida est\'andar tomando como entrada un archivo predefinido e invocando al programa
       utilizando como opciones `-i archivoInput -o -'.
-      \textcolor{red}{COMENTAR}
+      
       \end{itemize}
 
     \subsubsection{Prueba 5}
@@ -256,7 +256,7 @@ archivo destino.
       \newline
       Como en el caso `dos2unix', se utiliza la entrada y la salida est\'andar. Se invoca al programa con las opciones
       ` -i - -o -'.
-      \textcolor{red}{COMENTAR}
+      
       \end{itemize}
 
 
@@ -276,7 +276,7 @@ archivo destino.
       \newline
       Como en el caso de `dos2unix', se invoca al programa sin ning\'un par\'ametro y el programa toma su comportamiento
       por defecto.
-      \textcolor{red}{COMENTAR}
+      
       \end{itemize}
 
   \subsection{Distintos archivos de prueba}
@@ -293,7 +293,7 @@ archivo destino.
       \includegraphics[width=8cm, viewport=0 0 898 153]{../Informe/Imagenes/prueba1-archivo-unix2dos.png}	
       \newline
       Al igual que en el caso de `dos2unix' al pasar un archivo vac\'io como entrada, se genera un archivo vac\'o de salida.
-      \textcolor{red}{COMENTAR}
+      
       \end{itemize}
 
     \subsubsection{Prueba 2}
@@ -305,14 +305,14 @@ archivo destino.
       \newline
       Al invocar un programa con un archivo de entrada inexistente, el mismo devuelve por stderr el mensaje de error correspondiente.
       En este caso: {\bf ``Archivo de or\'igen no existe.''}.
-      \textcolor{red}{COMENTAR}
+      
       \item \textbf{unix2dos}
       \newline
       \includegraphics[width=8cm, viewport=0 0 895 128]{../Informe/Imagenes/prueba2-archivo-unix2dos.png}
       \newline
       Al igual que en el caso de `dos2unix', al invocar el programa con un archivo de entrada inexistente, devuelve un mensaje por stderr
       informando dicho error.
-      \textcolor{red}{COMENTAR}
+      
       \end{itemize}
 
     \subsubsection{Prueba 3}
@@ -327,7 +327,7 @@ archivo destino.
       Al ingresar un archivo complejo como entrada, y ejecutar el programa, se muestra utilizando {\bf od} la salida
       del archivo de entrada original y el resultado obtenido como salida del mismo. Como puede observarse al comparar
       ambos archivos, la salida es la esperada.
-      \textcolor{red}{COMENTAR}
+      
       \item \textbf{unix2dos}
       \newline
       \includegraphics[width=10cm, viewport=0 0 837 798]{../Informe/Imagenes/prueba3-archivo-unix2dos1.png}
@@ -336,7 +336,7 @@ archivo destino.
       \newline
       Al realizar la misma prueba que en el caso de `dos2unix', e ingresar un archivo complejo como entrada, se muestra
       ambos archivos (el de entrada original y el de salida, luego de la conversi\'on); obteni\'endose el resultado esperado.
-      \textcolor{red}{COMENTAR}
+      
       \end{itemize}
     \subsubsection{Prueba 4}
     Conversi\'on de un archivo de un formato al otro, y el resultado convertirlo al formato original:
@@ -345,12 +345,19 @@ archivo destino.
       \newline
       \includegraphics[width=10cm, viewport=0 0 842 328]{../Informe/Imagenes/prueba4-archivo-dos2unix.png}	
       \newline
-     \ textcolor{red}{COMENTAR}
+      Como se observa en la figura, al convertir un archivo de un formato al otro, y luego utilizar el resultado obtenido como
+      entrada del programa que realiza la conversi\'on inversa, se obtiene como resultado un archivo id\'entico al archivo original.
+      
       \item \textbf{unix2dos}
       \newline
       \includegraphics[width=10cm, viewport=0 0 838 328]{../Informe/Imagenes/prueba4-archivo-unix2dos.png}	
       \newline
-      \textcolor{red}{COMENTAR}
+      Al igual que en el caso `dos2unix', se realizan las mismas conversiones, obteni\'endose los resultados esperados. La diferencia
+      entre estas dos corridas consiste en: que en la primera se ejecuta primero el programa {\bf unix2dos} y el resultado se lo toma como
+      entrada del programa {\bf dos2unix}; y en la segunda se ejecutan los programas en orden inverso. Tambi\'en, al realizarse esto, cabe aclarar
+      que los archivos que se utilizan como entrada corresponden al formato correspondiente de cada uno de los programas que se ejecutan en primer
+      lugar.
+      
       \end{itemize}
 
 \section{Conclusiones}
