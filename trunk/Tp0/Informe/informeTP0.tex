@@ -97,6 +97,27 @@ inversa para pasar de DOS a UNIX.
     Cadena que almacena la cadena de fin de linea del archivo destino.
   \end{itemize}
 
+\section{Preparando el ambiente para NetBSD}
+  Para probar el trabajo pr\'actico, lo primero que se debe realizar es enviar el c\'odigo fuente al entorno
+  del NetBSD. Se considera que el NetBSD se encuentra corriendo y que se ha creado el loopback necesario. Para ello, se deben realizar los siguientes pasos:
+  \begin{enumerate}
+   \item Abrir una consola e ingresar en modo root.
+   \item Copiar la carpeta ``Codigo`` del cd, a la carpeta del usuario gxemul:
+    \newline 
+      {\bf hostOS\# cp -r \textbackslash Unidad\_de\_CD\textbackslash Codigo \textbackslash home\textbackslash gxemul}
+   \item Conectar con el NetBSD a trav\'es de un t\'unel, se debe ingresar el password correspondiente al 
+	 usuario root del NetBSD:
+    \newline
+      {\bf hostOS\# ssh -p 2222 root@127.0.0.1}
+   \item Crear una carpeta para el Tp0, opcional se utiliza para una mejor organizaci\'on:
+    \newline 
+    {\bf guestOS\# mkdir Tp0}
+   \item Copiar la carpeta ''Codigo`` a la carpeta Tp0 del NetBSD, se debe ingresar el password correspondiente al
+         usuario gxemul del sistema operativo host:
+   \newline
+    {\bf guestOS\# scp -r gxemul@172.20.0.1:\textbackslash home\textbackslash gxemul\textbackslash Codigo \newline Tp0\textbackslash }
+  \end{enumerate}
+
 \section{Compilaci\'on en NetBSD}
   \subsection{Generando c\'odigo binario}
     Para poder compilar desde NetBSD y obtener el c\'odigo binario, se debe ejecutar:
