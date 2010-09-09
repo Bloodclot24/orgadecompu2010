@@ -165,6 +165,8 @@ En la siguiente secci\'on se detallaran los distintos archivos utilizados para p
 programa. Para ello se adjuntaran imagenes de corridas de los mismos; en donde se ense\~{n}a el dump del 
 archivo origen, en formato ASCII con barra invertidas para los caracteres de escape, y luego el del 
 archivo destino.
+En la seccion de "Distintas formas de invocaci\'on" se utiliza un archivo simple, con poco contenido, dado a que lo que se busca
+mostrar en las pruebas de esa seccion es el funcionamiento del programa con las distintas opcioens disponibles.
 
   \subsection{Distintas formas de invocaci\'on}
     \subsubsection{Prueba 1}
@@ -208,16 +210,15 @@ archivo destino.
       \begin{itemize}
       \item \textbf{dos2unix}
       \newline 
-      %\ falta
-      %\includegraphics[width=10cm, bb=0 0 901 246]{../Informe/Imagenes/prueba3-invocacion-dos2unix.png}
-      %\newline	
+      \includegraphics[width=10cm, viewport=0 0 665 281]{../Informe/Imagenes/prueba3-invocacion-dos2unix.png}
+      \newline	
       En este caso, se explicita el uso de la entrada est\'andar. La salida es almacenada en un archivo
       de salida. 
       \item \textbf{unix2dos}
       \newline 
       \includegraphics[width=10cm, viewport=0 0 897 181]{../Informe/Imagenes/prueba3-invocacion-unix2dos.png}	
       \newline
-      Como en el caso, `dos2unix', se explicita el uso de la entrada est\'andar, almacenando la salida en un archivo espec\'ificado por par\'ametro.
+      Como en el caso `dos2unix', se explicita el uso de la entrada est\'andar, almacenando la salida en un archivo espec\'ificado por par\'ametro.
       Se muestra el resultado obtenido en el archivo de salida, utilizando od.
       
     \end{itemize}
@@ -245,9 +246,8 @@ archivo destino.
       \begin{itemize}
       \item \textbf{dos2unix}
       \newline
-      %\ falta
-      %\includegraphics[width=10cm, bb=0 0 901 246]{prueba5-invocacion-dos2unix.png}
-      %\newline	
+      \includegraphics[width=10cm, viewport=0 0 662 164]{../Informe/Imagenes/prueba5-invocacion-dos2unix.png}
+      \newline	
       Como se muestra en la figura, se utiliza la entrada y salida est\'andar. Se invoca al programa con las opciones
       ` -i - -o -'.
       \item \textbf{unix2dos}
@@ -264,9 +264,8 @@ archivo destino.
     Invocaci\'on del programa con entrada por stdin y salida por stdout:
       \begin{itemize}
       \item \textbf{dos2unix}
-      %\newline
-      %\ falta
-      %\includegraphics[width=10cm, bb=0 0 901 246]{../Informe/Imagenes/prueba6-invocacion-dos2unix.png}
+      \newline
+      \includegraphics[width=10cm, viewport=0 0 661 173]{../Informe/Imagenes/prueba6-invocacion-dos2unix.png}
       \newline
       Como se muestra en la figura, se invoca al programa sin ning\'un par\'ametro y el mismo toma como comportamiento por defecto
       la entrada por entrada est\'andar y la salida por salida est\'andar.
