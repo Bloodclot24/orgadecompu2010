@@ -65,7 +65,7 @@
     forma se crea el archivo, si no existe), en los casos en los que sea necesario. Dado que si la funci\'on
     se invoca en alguna de las posibles combinaciones que permiten stdin y/o stdout, se utiliza dichos 
     archivos.
-  \item Se llama a la funci\'on {\bf traducirFormato}, detallada previamente, con los par\'ametros 
+  \item Se llama a la funci\'on {\bf traducirFormato}, con los par\'ametros 
     correspondientes al modo del que fue invocada la aplicaci\'on.
   \item Se cierran ambos archivos, en caso de que corresponda.
   \end{itemize}
@@ -80,7 +80,7 @@
   archivo de salida el fin de l\'inea de la otra plataforma. 
   El encabezado de la funci\'on es el siguiente:
   \newline
-  {\bf void parser(FILE * origen, FILE * destino, char *finLinea, char *finLineaNuevo)}
+  {\bf void traducirFormato(FILE * origen, FILE * destino, char *finLinea, char *finLineaNuevo)}
   \newline
   Los par\'ametros que recibe son:
 
@@ -159,7 +159,7 @@
 
 
 \section{Casos de prueba}
-En la siguiente secci\'on se detallaran los distintos archivos utilizados para probar el funcionamiento del
+En la siguiente secci\'on se detallar\'an los distintos archivos utilizados para probar el funcionamiento del
 programa. Para ello se adjuntaran imagenes de corridas de los mismos; en donde se ense\~{n}a el dump del 
 archivo origen, en formato ASCII con barra invertidas para los caracteres de escape, y luego el del 
 archivo destino.
@@ -234,7 +234,7 @@ mostrar en las pruebas de esa seccion es el funcionamiento del programa con las 
       \newline
       \includegraphics[width=10cm, viewport=0 0 898 177]{../Informe/Imagenes/prueba4-invocacion-unix2dos.png}	
       \newline
-      Como en el caso `dos2unix', se expl\'icita el uso de la salida est\'andar tomando como entrada un archivo predefinido e invocando al programa
+      Como en el caso `dos2unix', se explicita el uso de la salida est\'andar tomando como entrada un archivo predefinido e invocando al programa
       utilizando como opciones `-i archivoInput -o -'.
       
       \end{itemize}
