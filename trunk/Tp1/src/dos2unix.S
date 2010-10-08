@@ -20,9 +20,9 @@ error_getopt_2p:	.asciiz	"Error, se esperaba una ruta despues de la opcion.\n"
 	.ent main
 main:
 	subu 	sp, sp, 40	
-	sw	ra, 32(sp)
+	sw	ra, 32(sp)	# guardo ra dado que llamo a otra funcion (parser)
 	sw 	$fp, 28(sp)
-	sw	gp, 24(sp)	# guardo ra dado que llamo a otra funcion
+	sw	gp, 24(sp)	
 	move 	$fp, sp
 
 	#argc y argv estan ya en a0 y a1?????
@@ -42,7 +42,7 @@ fin_main:
 	lw 	gp, 24(sp)
 	addu	sp, sp, 40
 	jr	ra
-	.end main	
+.end main	
 
 parser:
 	subu	sp, sp, 48
@@ -51,8 +51,8 @@ parser:
 	sw	gp, 32(sp)
 	move	$fp, sp
 
-#	lw t2, stdin	#origen
-#	lw t3, stdout	#destino
+#	la t2, stdin	#origen inicializado
+#	la t3, stdout	#destino inicializado
 
 while_loop:	
 	la 	t0, getopt	#leo un caracter de getopt, ???? verificar...
@@ -77,7 +77,7 @@ caso_getopt_i:
 	lw	t0, v0		#t0 <- strcmp(archivoEntrada, "-")
 	lw	t1, 0	
 
-	bne	t0, t1, abrir_archivo_entrada 
+	bne	t0, t1, abrir_archivo_entrada 		
 	b	while_loop
 
 abrir_archivo_entrada:
@@ -105,13 +105,20 @@ fin_while_loop:
 
 	# cargar valor de retorno en v0
 	la 	v0, exit_success
-
-
 	
-	.end parser
+	#fin funcion parser	
+	move 	sp, $fp
+	lw 	ra, 40(sp)
+	lw	$fp, 36(sp)
+	lw	gp, 32(sp)
+	addu	sp, sp, 48
+	jr	ra
 
 
 traducir_formato:
-	
+#a0 <- FILE * origen
+#a1 <- FILE * destino
+#a2 <- char *finLinea
+#a3 <- char *finLineaNuevo	
 
-	.end traducirFormato
+	
