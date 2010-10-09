@@ -1,7 +1,21 @@
 #include <mips/regdef.h>
 #include <sys/syscall.h>
 
-#### Funcion traducirFormato ####
+############## CONSTANTES ##############
+.rdata
+  FIN_LINEA: 		.asciiz "\n"
+  FIN_LINEA_NUEVA:	.asciiz "\r\n"
+  STR_GUION:		.asciiz "-"
+  OPCIONES:		.asciiz "i:o:"
+  RT:			.asciiz "rt"
+  WT:			.asciiz "wt"
+  
+  # Salidas
+  EXIT_SUCCESS:		.byte 0
+  ERROR_ARG:		.byte 1
+  ERROR_FILE:		.byte 2
+
+####### Funcion traducirFormato #######
 .text
 .align 2
 .global traducirFormato
@@ -16,34 +30,34 @@ traducirFormato:
   sw	gp,32(sp)
   move	$fp,sp
 
-  # Argumentos
+  # Argumentos recibidos
   sw	a0,48($fp) # origen
   sw	a1,52($fp) # destino
   sw	a2,56($fp) # finLinea
   sw	a3,60($fp) # finLineaNueva
 
   # Cargo el argumento para fgetc(origen)
-  lw	a0,48($fp) # Cargo el argumento fgetc
-  la	t9,fgetc   # Llamo a fgetc
+  lw	a0,48($fp)    # Cargo el argumento fgetc
+  la	t9,fgetc      # Llamo a fgetc
   jal	ra,t9
   sb	v0,24($fp) 
 
-L1:
-  lb	v1,24($fp)
+while_loop:
+  lb	v1,24($fp)    # sizeof(c) = 1; 1 byte
   li	v0,-1
-  bne	v1,v0,L2    # c != EOF
+  bne	v1,v0,loop    # c != EOF
   b	fin_traducirFormato
 
-L2:
+loop:
   lw	v0,56($fp)
   lb	v1,24($fp)
   lb	v0,0(v0)
-  bne	v1,v0,L5    # if(c != finLinea[0])
+  bne	v1,v0,funcion_fputc    # if(c != finLinea[0])
   lw	a0,56($fp)  # Cargo el argumento para strlen(finLinea)    
   la	t9,strlen   
   jal	ra,t9       # Llamo a strlen 
   sltu	v0,v0,2
-  bne	v0,zero,L4  # strlen(finLinea) != 0
+  bne	v0,zero,funcion_fputs  # strlen(finLinea) != 0
   lw	a0,48($fp)  # Cargo el argumento para fgetc(origen)
   la	t9,fgetc    
   jal	ra,t9       # Llamo a fgetc 
@@ -52,14 +66,14 @@ L2:
   addu	v0,v0,1     
   lb	v1,25($fp)
   lb	v0,0(v0)
-  bne	v1,v0,L3    # if(c2 != finLinea[1])
+  bne	v1,v0,loop2 # if(c2 != finLinea[1])
   lw	a0,60($fp)  # Cargo el argumento para fputs(finLineaNueva)
   lw	a1,52($fp)  # Cargo el argumento para fputs(destino)
   la	t9,fputs     
   jal	ra,t9       # Llamo a fputs 
-  b	L6
+  b	funcion_fgetc
 
-L3:
+loop2:
   lb	v0,24($fp)     
   move	a0,v0       # Cargo el argumento para fputc(c)
   lw	a1,52($fp)  # Cargo el argumento para fputc(destino)
@@ -67,44 +81,44 @@ L3:
   jal	ra,t9	    # Llamo a fputc(c, destino)
   lb	v1,25($fp)
   li	v0,-1
-  beq	v1,v0,L6    # if(c2 == EOF)
+  beq	v1,v0,funcion_fgetc    # if(c2 == EOF)
   lb	v0,25($fp)
   move	a0,v0       # Cargo el argumento para fputc(c2)
   lw	a1,52($fp)  # Cargo el argumento para fputc(destino)
   la	t9,fputc     
   jal	ra,t9       # Llamo fputc(c2, destino)  
-  b	L6
+  b	funcion_fgetc
 
-L4:
-  lw	a0,60($fp)  # Cargo el argumento para fputc(finLineaNueva)
-  lw	a1,52($fp)  # Cargo el argumento para fputc(destino)
+funcion_fputs:
+  lw	a0,60($fp)  # Cargo el argumento para fputs(finLineaNueva)
+  lw	a1,52($fp)  # Cargo el argumento para fputs(destino)
   la	t9,fputs
-  jal	ra,t9       # Llamo a fputc(finLineaNueva, destino)     
-  b	L6
+  jal	ra,t9       # Llamo a fputs(finLineaNueva, destino)     
+  b	funcion_fgetc
 
-L5:
+funcion_fputc:
   lb	v0,24($fp)  
   move	a0,v0       # Cargo el argumento para fputc(c)
   lw	a1,52($fp)  # Cargo el argumento para fputc(destino)
   la	t9,fputc 
   jal	ra,t9       # Llamo a fputc(c, destino)
 
-L6:
+funcion_fgetc:
   lw	a0,48($fp)  # Cargo el argumento para fgetc(origen)
   la	t9,fgetc
   jal	ra,t9       # Llamo a fgetc(origen) 
   sb	v0,24($fp)
-  b	L1
+  b	while_loop
 
 fin_traducirFormato:
   move	sp,$fp
   lw	ra,40(sp)
   lw	$fp,36(sp)
-  addu sp,sp,48
+  addu 	sp,sp,48
   jr	ra
 .end traducirFormato
 
-#### Funcion parser ####
+######## Funcion parser ########
 .text
 .align 2
 .global parser
@@ -119,14 +133,13 @@ parser:
   sw 	gp,56(sp)
   move 	$fp,sp
 
-  # Argumentos
-  sw 	a0,72($fp)
-  sw 	a1,76($fp)
-  sw 	a2,80($fp)
-  sw 	a3,84($fp)
+  # Argumentos recibidos
+  sw 	a0,72($fp) # argc
+  sw 	a1,76($fp) # argv
+  sw 	a2,80($fp) # finLinea
+  sw 	a3,84($fp) # finLineaNueva
 
-  # Termino parser
-  b	fin_parser
+  # TODO: Marceloooooo
 
 fin_parser:
   move 	sp,$fp
@@ -137,7 +150,7 @@ fin_parser:
   jr	ra      
 .end parser
 
-#### Main de unix2dos #### 
+######## Main de unix2dos ########
 .text
 .align 2
 .global main
@@ -152,33 +165,26 @@ main:
   sw 	gp,24(sp)
   move 	$fp,sp
   
-  # Argumentos
+  # Argumentos recibidos
   sw 	a0,40($fp)
   sw 	a1,44($fp)
+
+  # No hay variables locales
 
   # Cargo los argumentos para llamar a la funcion parser
   lw 	a0,40($fp)
   lw 	a1,44($fp)
   la 	a2,FIN_LINEA
-  la 	a3,FIN_LINEA_NUEVO
+  la 	a3,FIN_LINEA_NUEVA
 
   # Llamo a la funcion parser
   #la	t9,parser
   #jal	ra,t9
 
   # Termino el main
-  b	fin_main
-
-fin_main:
   move	sp,$fp
   lw	ra,32(sp)
   lw	$fp,28(sp)
   addu	sp,sp,40
   jr	ra
 .end main
-
-#### CONSTANTES ####
-.rdata
-  FIN_LINEA: 		.asciiz "\n"
-  FIN_LINEA_NUEVO:	.asciiz "\r\n"
-
