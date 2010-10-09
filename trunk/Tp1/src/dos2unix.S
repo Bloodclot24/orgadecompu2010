@@ -1,17 +1,19 @@
 #include <mips/regdef.h>
 #include <sys/syscall.h>
 
-	.rdata
-FIN_LINEA: 		.asciiz "\r\n"
-FIN_LINEA_NUEVO:	.asciiz "\n"
-STR_GUION:		.asciiz "-"
-OPCIONES:		.asciiz "i:o:"
-RT:			.asciiz "rt"
-WT:			.asciiz "wt"
-
-EXIT_SUCCESS:		.byte 0
-ERROR_ARG:		.byte 1
-ERROR_FILE:		.byte 2
+############## CONSTANTES ##############
+.rdata
+  FIN_LINEA: 		.asciiz "\n"
+  FIN_LINEA_NUEVA:	.asciiz "\r\n"
+  STR_GUION:		.asciiz "-"
+  OPCIONES:		.asciiz "i:o:"
+  RT:			.asciiz "rt"
+  WT:			.asciiz "wt"
+  
+  # Salidas
+  EXIT_SUCCESS:		.byte 0
+  ERROR_ARG:		.byte 1
+  ERROR_FILE:		.byte 2
 
 error_archivo_origen:	.asciiz "Archivo de origen no existe.\n"
 error_getopt_2p:	.asciiz	"Error, se esperaba una ruta despues de la opcion.\n"
@@ -42,9 +44,9 @@ parser:
 	li 	s1, 1		#destino = stdout
 	li	s2, 0		#archivoEntrada
 	li	s3, 0		#archivoSalida
-	b	while_loop
+	b	while_loop_parser
 
-while_loop:	
+while_loop_parser:	
 	la	a0, 72($fp)	#a0 <- argc
 	la	a1, 76($fp)	#a1 <- argv
 	la	a2, OPCIONES	#a2 <- "i:o:"
@@ -72,7 +74,7 @@ caso_getopt_i:
 	jal 	ra, t9
 	move	t0, v0		#t0 <- strcmp(archivoEntrada, "-")
 	bne	t0, zero, abrir_archivo_entrada 		
-	b	while_loop
+	b	while_loop_parser
 
 abrir_archivo_entrada:
 	#llamo a fopen	
@@ -126,7 +128,7 @@ fin_while_loop:
 	move	a0, s0
 	move	a1, s1
 	la	a2, FIN_LINEA	
-	la	a3, FIN_LINEA_NUEVO
+	la	a3, FIN_LINEA_NUEVA
 	
 	#llamo a traducir formato
 	
@@ -147,13 +149,108 @@ fin_parser:
 	jr	ra
 	.end parser
 
+####### Funcion traducirFormato #######
 .text
 .align 2
 .global traducirFormato
 .ent traducirFormato
+
 traducirFormato:
-#TODO
-.end traducirFormato
+  	.frame $fp,48,ra
+	subu	sp,sp,48
+	.cprestore 16
+	sw	ra,40(sp)
+	sw	$fp,36(sp)
+	sw	gp,32(sp)
+	move	$fp,sp
+
+	# Argumentos recibidos
+	sw	a0,48($fp) # origen
+	sw	a1,52($fp) # destino
+	sw	a2,56($fp) # finLinea
+	sw	a3,60($fp) # finLineaNueva
+
+	# Cargo el argumento para fgetc(origen)
+	lw	a0,48($fp)    # Cargo el argumento fgetc
+	la	t9,fgetc      # Llamo a fgetc
+	jal	ra,t9
+	sb	v0,24($fp) 
+
+while_loop:
+	lb	v1,24($fp)    # sizeof(c) = 1; 1 byte
+	li	v0,-1
+	bne	v1,v0,loop    # c != EOF
+	b	fin_traducirFormato
+
+loop:
+	lw	v0,56($fp)
+	lb	v1,24($fp)
+	lb	v0,0(v0)
+	bne	v1,v0,funcion_fputc    # if(c != finLinea[0])
+	lw	a0,56($fp)  # Cargo el argumento para strlen(finLinea)    
+	la	t9,strlen   
+	jal	ra,t9       # Llamo a strlen 
+	sltu	v0,v0,2
+	bne	v0,zero,funcion_fputs  # strlen(finLinea) != 0
+	lw	a0,48($fp)  # Cargo el argumento para fgetc(origen)
+	la	t9,fgetc    
+	jal	ra,t9       # Llamo a fgetc 
+	sb	v0,25($fp)    
+	lw	v0,56($fp) 
+	addu	v0,v0,1     
+	lb	v1,25($fp)
+	lb	v0,0(v0)
+	bne	v1,v0,loop2 # if(c2 != finLinea[1])
+	lw	a0,60($fp)  # Cargo el argumento para fputs(finLineaNueva)
+	lw	a1,52($fp)  # Cargo el argumento para fputs(destino)
+	la	t9,fputs     
+	jal	ra,t9       # Llamo a fputs 
+	b	funcion_fgetc
+
+loop2:
+	lb	v0,24($fp)     
+	move	a0,v0       # Cargo el argumento para fputc(c)
+	lw	a1,52($fp)  # Cargo el argumento para fputc(destino)
+	la	t9,fputc        
+	jal	ra,t9	    # Llamo a fputc(c, destino)
+	lb	v1,25($fp)
+	li	v0,-1
+	beq	v1,v0,funcion_fgetc    # if(c2 == EOF)
+	lb	v0,25($fp)
+	move	a0,v0       # Cargo el argumento para fputc(c2)
+	lw	a1,52($fp)  # Cargo el argumento para fputc(destino)
+	la	t9,fputc     
+	jal	ra,t9       # Llamo fputc(c2, destino)  
+	b	funcion_fgetc
+
+funcion_fputs:
+	lw	a0,60($fp)  # Cargo el argumento para fputs(finLineaNueva)
+	lw	a1,52($fp)  # Cargo el argumento para fputs(destino)
+	la	t9,fputs
+	jal	ra,t9       # Llamo a fputs(finLineaNueva, destino)     
+	b	funcion_fgetc
+
+funcion_fputc:
+	lb	v0,24($fp)  
+	move	a0,v0       # Cargo el argumento para fputc(c)
+	lw	a1,52($fp)  # Cargo el argumento para fputc(destino)
+	la	t9,fputc 
+	jal	ra,t9       # Llamo a fputc(c, destino)
+
+funcion_fgetc:
+	lw	a0,48($fp)  # Cargo el argumento para fgetc(origen)
+	la	t9,fgetc
+	jal	ra,t9       # Llamo a fgetc(origen) 
+	sb	v0,24($fp)
+	b	while_loop
+
+fin_traducirFormato:
+	move	sp,$fp
+	lw	ra,40(sp)
+	lw	$fp,36(sp)
+	addu 	sp,sp,48
+	jr	ra
+	.end traducirFormato
 
 
 .text
@@ -176,7 +273,7 @@ main:
   	#lw 	a0,40($fp)	#hace falta? ya estan en a0 y a1
   	#lw 	a1,44($fp)
 	la 	a2, FIN_LINEA
-	la 	a3, FIN_LINEA_NUEVO
+	la 	a3, FIN_LINEA_NUEVA
 
 	# llamo a la funcion parser
 	la	t9, parser
