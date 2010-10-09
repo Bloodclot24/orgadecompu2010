@@ -9,6 +9,7 @@ OPCIONES:		.asciiz "i:o:"
 RT:			.asciiz "rt"
 WT:			.asciiz "wt"
 
+EXIT_SUCCESS:		.byte 0
 ERROR_ARG:		.byte 1
 ERROR_FILE:		.byte 2
 
@@ -19,21 +20,28 @@ error_getopt_2p:	.asciiz	"Error, se esperaba una ruta despues de la opcion.\n"
 .align 2
 	.globl main
 	.ent main
+
 main:
+	.frame  $fp,40,ra
 	subu 	sp, sp, 40	
+	.cprestore 16
 	sw	ra, 32(sp)	# guardo ra dado que llamo a otra funcion (parser)
 	sw 	$fp, 28(sp)
 	sw	gp, 24(sp)	
 	move 	$fp, sp
 
-	#argc y argv estan ya en a0 y a1?????
 	sw 	a0, 40($fp)
 	sw 	a1, 44($fp)
+
+  	lw 	a0,40($fp)
+  	lw 	a1,44($fp)
 	la 	a2, FIN_LINEA
 	la 	a3, FIN_LINEA_NUEVO
 
 	# llamo a la funcion parser
-	jal 	parser
+	la	t9, parser
+	jal	ra, t9
+	#jal 	parser
 	b 	fin_main
 
 fin_main:
@@ -45,14 +53,30 @@ fin_main:
 	jr	ra
 	.end main	
 
+
+
+	.globl parser
+	.ent parser
 parser:
-	subu	sp, sp, 48
-	sw	ra, 40(sp)
-	sw	$fp, 36(sp)
-	sw	gp, 32(sp)
+	.frame  $fp, 72, ra
+	subu	sp, sp, 72
+	.cprestore 16
+	sw	ra, 64(sp)
+	sw	$fp, 60(sp)
+	sw	gp, 58(sp)
 	move	$fp, sp
-#	la 	t2, stdin	#origen inicializado
-#	la 	t3, stdout	#destino inicializado
+
+
+
+# Variables locales
+#	TODO: MODIFICAR 
+	li 	16($fp), 0		#origen = stdin		
+	li 	20($fp), 1		#destino = stdout
+	li	24($fp), 0		#archivoEntrada
+	li	28($fp), 0		#archivoSalida
+
+#	li 	t2, 0		#origen = stdin		
+#	li 	t3, 1		#destino = stdout
 #	li	t4, 0		#archivoEntrada
 #	li	t5, 0		#archivoSalida
 	b	while_loop
@@ -78,7 +102,7 @@ while_loop:
 
 caso_getopt_i:
 	lw	v0, optarg	#llamo a optarg
-	lw	t4, v0
+	lw	24($fp), v0
 	lw 	a0, v0 
 	la 	a1, STR_GUION
 	la	t9, strcmp	#se puede usar strcmp?????
@@ -93,8 +117,8 @@ abrir_archivo_entrada:
 	la	a1, RT
 	la	t9, fopen
 	jal 	ra, t9
-	lw	t2, v0
-	beq	t2, zero, error_abrir_archivo_entrada
+	lw	16($fp), v0
+	beq	16($fp), zero, error_abrir_archivo_entrada
 
 error_abrir_archivo_entrada:
 	#imprimo mensaje de error por stderr
@@ -109,10 +133,14 @@ error_abrir_archivo_entrada:
 
 caso_getopt_o:
 	lw	v0, optarg	#llamo a optarg
-	lw	t5, v0
+	lw	28($fp), v0
 	la	a0, v0
 	la 	a1, STR_GUION
 	la	t9, strcmp	
+	lw	a0, t5
+	la	a1, WT
+	la	t9, fopen
+	jal	ra, t9
 	b	while_loop
 
 
@@ -126,34 +154,29 @@ caso_getopt_2p:		#seria el caso ':'
 
 
 fin_while_loop:
-	lw	a0, t2
-	lw	a1, t3
+	lw	a0, 16($fp)
+	lw	a1, 20($fp)
 	la	a2, FIN_LINEA	
 	la	a3, FIN_LINEA_NUEVO
 	
 	#llamo a traducir formato
-	jal 	traducir_formato
+	
+	jal 	traducirFormato
 
 	# cargar valor de retorno en v0
-	li 	v0, 0	#EXIT_SUCCESS
+	la 	v0, EXIT_SUCCESS
 	
 	b	fin_parser
 
 fin_parser:	
 	move 	sp, $fp
-	lw 	ra, 40(sp)
-	lw	$fp, 36(sp)
-	lw	gp, 32(sp)
-	addu	sp, sp, 48
+	lw 	ra, 64(sp)
+	lw	$fp, 60(sp)
+	lw	gp, 58(sp)
+	addu	sp, sp, 72
 	jr	ra
 
 
-traducir_formato:
-#a0 <- FILE * origen
-#a1 <- FILE * destino
-#a2 <- char *finLinea
-#a3 <- char *finLineaNuevo	
-	subu 	sp, sp, 40	
-	sw 	$fp, 32(sp)
-	sw	gp, 28(sp)	
-	move 	$fp, sp		
+traducirFormato:
+#TODO
+
