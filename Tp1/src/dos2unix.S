@@ -18,8 +18,8 @@ error_getopt_2p:	.asciiz	"Error, se esperaba una ruta despues de la opcion.\n"
 
 .text
 .align 2
-	.globl main
-	.ent main
+.globl main
+.ent main
 
 main:
 	.frame  $fp,40,ra
@@ -33,15 +33,14 @@ main:
 	sw 	a0, 40($fp)
 	sw 	a1, 44($fp)
 
-  	lw 	a0,40($fp)
-  	lw 	a1,44($fp)
+  	#lw 	a0,40($fp)	#hace falta? ya estan en a0 y a1
+  	#lw 	a1,44($fp)
 	la 	a2, FIN_LINEA
 	la 	a3, FIN_LINEA_NUEVO
 
 	# llamo a la funcion parser
 	la	t9, parser
 	jal	ra, t9
-	#jal 	parser
 	b 	fin_main
 
 fin_main:
@@ -55,35 +54,42 @@ fin_main:
 
 
 
-	.globl parser
-	.ent parser
+.text
+.align 2
+.global parser
+.ent parser
+
 parser:
 	.frame  $fp, 72, ra
 	subu	sp, sp, 72
 	.cprestore 16
 	sw	ra, 64(sp)
 	sw	$fp, 60(sp)
-	sw	gp, 58(sp)
+	sw	gp, 56(sp)
 	move	$fp, sp
 
+	sw 	a0, 72($fp)
+	sw 	a1, 76($fp)
+	sw 	a2, 80($fp)
+	sw 	a3, 84($fp)
 
 
 # Variables locales
-#	TODO: MODIFICAR 
+	li 	t2, 0		#origen = stdin		
+	li 	t3, 1		#destino = stdout
+	li	t4, 0		#archivoEntrada
+	li	t5, 0		#archivoSalida
+
 	li 	16($fp), 0		#origen = stdin		
 	li 	20($fp), 1		#destino = stdout
 	li	24($fp), 0		#archivoEntrada
 	li	28($fp), 0		#archivoSalida
 
-#	li 	t2, 0		#origen = stdin		
-#	li 	t3, 1		#destino = stdout
-#	li	t4, 0		#archivoEntrada
-#	li	t5, 0		#archivoSalida
 	b	while_loop
 
 while_loop:	
-	la	a0, 48($fp)	#a0 <- argc
-	la	a1, 52($fp)	#a1 <- argv
+	la	a0, 72($fp)	#a0 <- argc
+	la	a1, 76($fp)	#a1 <- argv
 	la	a2, OPCIONES	#a2 <- "i:o:"
 	la 	t9, getopt	#llamo a la funcion getopt
 	jal	ra, t9
@@ -102,7 +108,7 @@ while_loop:
 
 caso_getopt_i:
 	lw	v0, optarg	#llamo a optarg
-	lw	24($fp), v0
+	lw	24($fp), v0	#el resultado es archivoEntrada
 	lw 	a0, v0 
 	la 	a1, STR_GUION
 	la	t9, strcmp	#se puede usar strcmp?????
@@ -113,11 +119,11 @@ caso_getopt_i:
 
 abrir_archivo_entrada:
 	#llamo a fopen	
-	lw	a0, t4
+	lw	a0, 24($fp)
 	la	a1, RT
 	la	t9, fopen
 	jal 	ra, t9
-	lw	16($fp), v0
+	lw	16($fp), v0	#el resultado es un origen (FILE*) 
 	beq	16($fp), zero, error_abrir_archivo_entrada
 
 error_abrir_archivo_entrada:
@@ -133,15 +139,21 @@ error_abrir_archivo_entrada:
 
 caso_getopt_o:
 	lw	v0, optarg	#llamo a optarg
-	lw	28($fp), v0
+	lw	28($fp), v0	#el resultado es archivoSalida
 	la	a0, v0
 	la 	a1, STR_GUION
 	la	t9, strcmp	
-	lw	a0, t5
+	jal 	ra, t9	
+	lw	t0, v0		#t0 <- strcmp(archivoSalida, "-")
+	bne	t0, zero, abrir_archivo_salida
+
+abrir_archivo_salida:
+	lw	a0, 28($fp)
 	la	a1, WT
 	la	t9, fopen
 	jal	ra, t9
 	b	while_loop
+
 
 
 caso_getopt_2p:		#seria el caso ':'
@@ -161,14 +173,15 @@ fin_while_loop:
 	
 	#llamo a traducir formato
 	
-	jal 	traducirFormato
+	la	t9, traducirFormato
+	jal 	ra, t9
 
 	# cargar valor de retorno en v0
 	la 	v0, EXIT_SUCCESS
 	
 	b	fin_parser
 
-fin_parser:	
+fin_parser:
 	move 	sp, $fp
 	lw 	ra, 64(sp)
 	lw	$fp, 60(sp)
@@ -177,6 +190,10 @@ fin_parser:
 	jr	ra
 
 
+.text
+.align 2
+.global traducirFormato
+.ent traducirFormato
 traducirFormato:
 #TODO
-
+.endTraducirFormato
