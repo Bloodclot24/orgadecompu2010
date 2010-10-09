@@ -3,6 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#define EXIT_SUCCESS 0
 #define ERROR_ARG 1
 #define ERROR_FILE 2
 
