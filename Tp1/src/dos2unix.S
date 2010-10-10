@@ -3,8 +3,8 @@
 
 ############## CONSTANTES ##############
 .rdata
-  FIN_LINEA: 		.asciiz "\n"
-  FIN_LINEA_NUEVA:	.asciiz "\r\n"
+  FIN_LINEA: 		.asciiz "\r\n"
+  FIN_LINEA_NUEVA:	.asciiz "\n"
   STR_GUION:		.asciiz "-"
   OPCIONES:		.asciiz "i:o:"
   RT:			.asciiz "rt"
@@ -17,7 +17,7 @@
 
 error_archivo_origen:	.asciiz "Archivo de origen no existe.\n"
 error_getopt_2p:	.asciiz	"Error, se esperaba una ruta despues de la opcion.\n"
-
+############## FIN CONSTANTES ##############
 
 .text
 .align 2
@@ -38,17 +38,22 @@ parser:
 	sw 	a2, 80($fp)
 	sw 	a3, 84($fp)
 
+	# Variables locales
+	li 	t0, 0		#origen = stdin		
+	li 	t1, 1		#destino = stdout
+	li	t2, 0		#archivoEntrada
+	li	t3, 0		#archivoSalida
 
-# Variables locales
-	li 	s0, 0		#origen = stdin		
-	li 	s1, 1		#destino = stdout
-	li	s2, 0		#archivoEntrada
-	li	s3, 0		#archivoSalida
+	sw	t0, 16($fp)
+	sw	t1, 20($fp)
+	sw	t2, 24($fp)
+	sw	t3, 28($fp)	
+
 	b	while_loop_parser
 
 while_loop_parser:	
-	la	a0, 72($fp)	#a0 <- argc
-	la	a1, 76($fp)	#a1 <- argv
+	lw	a0, 72($fp)	#a0 <- argc
+	lw	a1, 76($fp)	#a1 <- argv
 	la	a2, OPCIONES	#a2 <- "i:o:"
 	la 	t9, getopt	#llamo a la funcion getopt
 	jal	ra, t9
@@ -67,8 +72,8 @@ while_loop_parser:
 
 caso_getopt_i:
 	lw	v0, optarg	#llamo a optarg
-	move	s2, v0		#el resultado es archivoEntrada
-	move 	a0, v0 
+	sw	v0, 24($fp)	#el resultado es archivoEntrada
+	lw	a0, 24($fp)
 	la 	a1, STR_GUION
 	la	t9, strcmp	#se puede usar strcmp?????
 	jal 	ra, t9
@@ -78,11 +83,11 @@ caso_getopt_i:
 
 abrir_archivo_entrada:
 	#llamo a fopen	
-	move	a0, s2
+	lw	a0, 24($fp)
 	la	a1, RT
 	la	t9, fopen
 	jal 	ra, t9
-	move	s0, v0	#el resultado es un origen (FILE*) 
+	sw	v0, 16($fp)	#el resultado es un origen (FILE*) 
 	beq	s0, zero, error_abrir_archivo_entrada
 
 error_abrir_archivo_entrada:
@@ -98,8 +103,8 @@ error_abrir_archivo_entrada:
 
 caso_getopt_o:
 	lw	v0, optarg	#llamo a optarg
-	move	s3, v0		#el resultado es archivoSalida
-	move	a0, s3
+	sw	v0, 28($fp)		#el resultado es archivoSalida
+	lw	a0, 28($fp)
 	la 	a1, STR_GUION
 	la	t9, strcmp	
 	jal 	ra, t9	
@@ -107,10 +112,12 @@ caso_getopt_o:
 	bne	t0, zero, abrir_archivo_salida
 
 abrir_archivo_salida:
-	move	a0, s3
+	lw	a0, 28($fp)
+	#move	a0, s3
 	la	a1, WT
 	la	t9, fopen
 	jal	ra, t9
+	sw	v0, 20($fp)
 	b	while_loop
 
 
@@ -125,8 +132,8 @@ caso_getopt_2p:		#seria el caso ':'
 
 
 fin_while_loop:
-	move	a0, s0
-	move	a1, s1
+	lw	a0, 16($fp)
+	lw	a1, 20($fp)
 	la	a2, FIN_LINEA	
 	la	a3, FIN_LINEA_NUEVA
 	
@@ -140,14 +147,33 @@ fin_while_loop:
 	
 	b	fin_parser
 
+cerrar_archivo_origen:
+	lw	a0, 16($fp)
+	la	t9, fclose
+	jal 	ra, t9
+	
+cerrar_archivo_destino:
+	lw	a0, 20($fp)
+	la	t9, fclose
+	jal 	ra, t9
+
+
 fin_parser:
+	lw 	t0, 16($fp)
+	bne 	t0, zero, cerrar_archivo_origen
+	lw	t1, 20($fp)
+	bne 	t1, zero, cerrar_archivo_destino
+
 	move 	sp, $fp
 	lw 	ra, 64(sp)
 	lw	$fp, 60(sp)
 	lw	gp, 58(sp)
 	addu	sp, sp, 72
 	jr	ra
+
 	.end parser
+
+####### Fin parser ########	
 
 ####### Funcion traducirFormato #######
 .text
@@ -270,17 +296,16 @@ main:
 	sw 	a0, 40($fp)
 	sw 	a1, 44($fp)
 
-  	#lw 	a0,40($fp)	#hace falta? ya estan en a0 y a1
-  	#lw 	a1,44($fp)
+  	lw 	a0,40($fp)	#hace falta? ya estan en a0 y a1
+  	lw 	a1,44($fp)
 	la 	a2, FIN_LINEA
 	la 	a3, FIN_LINEA_NUEVA
 
 	# llamo a la funcion parser
 	la	t9, parser
 	jal	ra, t9
-	b 	fin_main
 
-fin_main:
+	#fin_main
 	move	sp, $fp
 	lw	ra, 32(sp)
 	lw	$fp, 28(sp)
