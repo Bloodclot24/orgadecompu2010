@@ -4,8 +4,8 @@
 #include "conversor.c"
 
 #define FIN_LINEA "\r\n"
-#define FIN_LINEA_NUEVO "\n"
+#define FIN_LINEA_NUEVA "\n"
 
 int main(int argc, char* argv[]) {
-  return parser(argc, argv, FIN_LINEA, FIN_LINEA_NUEVO);
+  return parser(argc, argv, FIN_LINEA, FIN_LINEA_NUEVA);
 }

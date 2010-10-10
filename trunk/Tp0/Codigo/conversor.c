@@ -7,20 +7,20 @@
 #define ERROR_ARG 1
 #define ERROR_FILE 2
 
-void traducirFormato(FILE * origen, FILE * destino, char *finLinea, char *finLineaNuevo){
+void traducirFormato(FILE * origen, FILE * destino, char *finLinea, char *finLineaNueva){
     char c = fgetc(origen);
     while(c != EOF){        
         if(c == finLinea[0]){
             if(strlen(finLinea) > 1){
                 char c2 = fgetc(origen);
                 if(c2 == finLinea[1]){
-                    fputs(finLineaNuevo, destino);
+                    fputs(finLineaNueva, destino);
                 }else{
                     fputc(c, destino);
                     if(c2 != EOF) fputc(c2, destino);
                 }
             }else{
-                fputs(finLineaNuevo, destino);
+                fputs(finLineaNueva, destino);
             }
         }else{
             fputc(c, destino);
@@ -30,7 +30,7 @@ void traducirFormato(FILE * origen, FILE * destino, char *finLinea, char *finLin
 }
 
 
-int parser(int argc, char **argv, char *FIN_LINEA, char *FIN_LINEA_NUEVO) {
+int parser(int argc, char **argv, char *FIN_LINEA, char *FIN_LINEA_NUEVA) {
     FILE* destino = stdout;
     FILE* origen = stdin;
     int c;
@@ -60,7 +60,7 @@ int parser(int argc, char **argv, char *FIN_LINEA, char *FIN_LINEA_NUEVO) {
     	}
     }
     
-    traducirFormato(origen, destino, FIN_LINEA, FIN_LINEA_NUEVO);
+    traducirFormato(origen, destino, FIN_LINEA, FIN_LINEA_NUEVA);
     
     if(archivoEntrada != 0) fclose(origen);
     if(archivoSalida != 0) fclose(destino); 
