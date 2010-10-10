@@ -114,6 +114,7 @@ fin_traducirFormato:
   move	sp,$fp
   lw	ra,40(sp)
   lw	$fp,36(sp)
+  lw	gp,32(sp)
   addu 	sp,sp,48
   jr	ra
 .end traducirFormato
@@ -185,6 +186,7 @@ main:
   move	sp,$fp
   lw	ra,32(sp)
   lw	$fp,28(sp)
+  lw	gp,24(sp)
   addu	sp,sp,40
   jr	ra
 .end main
