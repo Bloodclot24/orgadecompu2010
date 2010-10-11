@@ -9,7 +9,8 @@
   OPCIONES:		.asciiz "i:o:"
   RT:			.asciiz "rt"
   WT:			.asciiz "wt"
-  
+  SN:			.asciiz "%s\n"  
+
   # Salidas
   EXIT_SUCCESS:		.byte 0
   ERROR_ARG:		.byte 1
@@ -41,7 +42,7 @@ parser:
 	# Variables locales
 	li 	t0, 0		#origen = stdin		
 	li 	t1, 1		#destino = stdout
-	li	t2, 0		int c
+	li	t2, 0		#int c
 	li	t3, 0		#archivoEntrada
 	li	t4, 0		#archivoSalida
 
@@ -91,12 +92,13 @@ abrir_archivo_entrada:
 	la	t9, fopen
 	jal 	ra, t9
 	sw	v0, 24($fp)	#el resultado es un origen (FILE*) 
-	beq	s0, zero, error_abrir_archivo_entrada
+	beq	v0, zero, error_abrir_archivo_entrada
 
 error_abrir_archivo_entrada:
 	#imprimo mensaje de error por stderr
 	li	a0, 2		#2 es salida por stderr
-	la	a1, error_archivo_origen
+	la	a1, SN
+	la	a2, error_archivo_origen
 	la	t9, fprintf
 	jal 	ra, t9	
 	#retorno ERROR_FILE y salgo de la funcion
@@ -116,7 +118,6 @@ caso_getopt_o:
 
 abrir_archivo_salida:
 	lw	a0, 40($fp)
-	#move	a0, s3
 	la	a1, WT
 	la	t9, fopen
 	jal	ra, t9
@@ -127,7 +128,8 @@ abrir_archivo_salida:
 
 caso_getopt_2p:		#seria el caso ':'
 	li	a0, 2		#2 es salida por stderr
-	la	a1, error_getopt_2p
+	la	a1, SN
+	la	a2, error_getopt_2p
 	la	t9, fprintf
 	jal 	ra, t9	
 	lw	v0, ERROR_ARG	#??
