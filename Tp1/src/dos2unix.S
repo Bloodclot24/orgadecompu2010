@@ -46,8 +46,8 @@ parser:
 	li	t3, 0		#archivoEntrada
 	li	t4, 0		#archivoSalida
 
-	sw	t0, 24($fp)
-	sw	t1, 28($fp)
+	sw	t0, 28($fp)	#guardo primero destino y despues origen
+	sw	t1, 24($fp)
 	sw	t2, 32($fp)
 	sw	t3, 36($fp)
 	sw	t4, 40($fp)	
@@ -91,7 +91,7 @@ abrir_archivo_entrada:
 	la	a1, RT
 	la	t9, fopen
 	jal 	ra, t9
-	sw	v0, 24($fp)	#el resultado es un origen (FILE*) 
+	sw	v0, 28($fp)	#el resultado es un origen (FILE*) 
 	beq	v0, zero, error_abrir_archivo_entrada
 
 error_abrir_archivo_entrada:
@@ -100,7 +100,7 @@ error_abrir_archivo_entrada:
 	la	a1, SN
 	la	a2, error_archivo_origen
 	la	t9, fprintf
-	jal 	ra, t9	
+	#jal 	ra, t9	
 	#retorno ERROR_FILE y salgo de la funcion
 	lw	v0, ERROR_FILE
 	b 	fin_parser	
@@ -121,7 +121,7 @@ abrir_archivo_salida:
 	la	a1, WT
 	la	t9, fopen
 	jal	ra, t9
-	sw	v0, 28($fp)
+	sw	v0, 24($fp)
 	b	while_loop
 
 
@@ -137,8 +137,8 @@ caso_getopt_2p:		#seria el caso ':'
 
 
 fin_while_loop:
-	lw	a0, 24($fp)
-	lw	a1, 28($fp)
+	la	a0, 28($fp)
+	la	a1, 24($fp)
 	la	a2, FIN_LINEA	
 	la	a3, FIN_LINEA_NUEVA
 	
@@ -152,22 +152,33 @@ fin_while_loop:
 	
 	b	fin_parser
 
-cerrar_archivo_origen:
-	lw	a0, 24($fp)
-	la	t9, fclose
-	jal 	ra, t9
+#cerrar_archivo_origen:
+#	lw	a0, 28($fp)
+#	la	t9, fclose
+#	jal 	ra, t9
 	
-cerrar_archivo_destino:
-	lw	a0, 28($fp)
-	la	t9, fclose
-	jal 	ra, t9
+#cerrar_archivo_destino:
+#	lw	a0, 24($fp)
+#	la	t9, fclose
+#	jal 	ra, t9
 
+cerrar_archivo_origen: 
+    lw     t0, 24($fp) 
+    beq   t0, zero, cerrando_archivo_destino 
+    lw    a0, 24($fp) 
+    la    t9, fclose 
+    jal    ra, t9 
+
+cerrar_archivo_destino: 
+  lw    t1, 28($fp) 
+  beq   t1, zero, fin_parser 
+  lw    a0, 28($fp) 
+  la    t9, fclose 
+  jal     ra, t9
 
 fin_parser:
-	lw 	t0, 24($fp)
+	lw 	t0, 28($fp)
 	bne 	t0, zero, cerrar_archivo_origen
-	lw	t1, 28($fp)
-	bne 	t1, zero, cerrar_archivo_destino
 
 	move 	sp, $fp
 	lw 	ra, 64(sp)
