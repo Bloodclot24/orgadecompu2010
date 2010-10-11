@@ -164,7 +164,7 @@ fin_while_loop:
 
 cerrar_archivo_origen: 
     lw     t0, 24($fp) 
-    beq   t0, zero, cerrando_archivo_destino 
+    beq   t0, zero, cerrar_archivo_destino 
     lw    a0, 24($fp) 
     la    t9, fclose 
     jal    ra, t9 
