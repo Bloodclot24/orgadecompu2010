@@ -75,8 +75,8 @@ while_loop_parser:
 
 caso_getopt_i:
 	lw	v0, optarg	#llamo a optarg
-	sw	v0, 32($fp)	#el resultado es archivoEntrada
-	lw	a0, 32($fp)
+	sw	v0, 36($fp)	#el resultado es archivoEntrada
+	lw	a0, 36($fp)
 	la 	a1, STR_GUION
 	la	t9, strcmp	#se puede usar strcmp?????
 	jal 	ra, t9
@@ -86,7 +86,7 @@ caso_getopt_i:
 
 abrir_archivo_entrada:
 	#llamo a fopen	
-	lw	a0, 32($fp)
+	lw	a0, 36($fp)
 	la	a1, RT
 	la	t9, fopen
 	jal 	ra, t9
@@ -106,8 +106,8 @@ error_abrir_archivo_entrada:
 
 caso_getopt_o:
 	lw	v0, optarg	#llamo a optarg
-	sw	v0, 36($fp)		#el resultado es archivoSalida
-	lw	a0, 36($fp)
+	sw	v0, 40($fp)		#el resultado es archivoSalida
+	lw	a0, 40($fp)
 	la 	a1, STR_GUION
 	la	t9, strcmp	
 	jal 	ra, t9	
@@ -115,12 +115,12 @@ caso_getopt_o:
 	bne	t0, zero, abrir_archivo_salida
 
 abrir_archivo_salida:
-	lw	a0, 36($fp)
+	lw	a0, 40($fp)
 	#move	a0, s3
 	la	a1, WT
 	la	t9, fopen
 	jal	ra, t9
-	sw	v0, 20($fp)
+	sw	v0, 28($fp)
 	b	while_loop
 
 
