@@ -41,13 +41,15 @@ parser:
 	# Variables locales
 	li 	t0, 0		#origen = stdin		
 	li 	t1, 1		#destino = stdout
-	li	t2, 0		#archivoEntrada
-	li	t3, 0		#archivoSalida
+	li	t2, 0		int c
+	li	t3, 0		#archivoEntrada
+	li	t4, 0		#archivoSalida
 
-	sw	t0, 16($fp)
-	sw	t1, 20($fp)
-	sw	t2, 24($fp)
-	sw	t3, 28($fp)	
+	sw	t0, 24($fp)
+	sw	t1, 28($fp)
+	sw	t2, 32($fp)
+	sw	t3, 36($fp)
+	sw	t4, 40($fp)	
 
 	b	while_loop_parser
 
@@ -57,9 +59,10 @@ while_loop_parser:
 	la	a2, OPCIONES	#a2 <- "i:o:"
 	la 	t9, getopt	#llamo a la funcion getopt
 	jal	ra, t9
-	move 	t0, v0		#leo un caracter de getopt, ???? verificar...
-	li	t1, -1
-	
+	sw	v0, 32($fp)
+
+	lw	t0, 32($fp)
+	li	t1, -1	
 	#switch del while	
 	beq	t0, t1, fin_while_loop	#si es -1, voy a fin_while_loop
 	li	t1, 105 		# 105 es el caracter 'i'
@@ -72,8 +75,8 @@ while_loop_parser:
 
 caso_getopt_i:
 	lw	v0, optarg	#llamo a optarg
-	sw	v0, 24($fp)	#el resultado es archivoEntrada
-	lw	a0, 24($fp)
+	sw	v0, 32($fp)	#el resultado es archivoEntrada
+	lw	a0, 32($fp)
 	la 	a1, STR_GUION
 	la	t9, strcmp	#se puede usar strcmp?????
 	jal 	ra, t9
@@ -83,11 +86,11 @@ caso_getopt_i:
 
 abrir_archivo_entrada:
 	#llamo a fopen	
-	lw	a0, 24($fp)
+	lw	a0, 32($fp)
 	la	a1, RT
 	la	t9, fopen
 	jal 	ra, t9
-	sw	v0, 16($fp)	#el resultado es un origen (FILE*) 
+	sw	v0, 24($fp)	#el resultado es un origen (FILE*) 
 	beq	s0, zero, error_abrir_archivo_entrada
 
 error_abrir_archivo_entrada:
@@ -103,8 +106,8 @@ error_abrir_archivo_entrada:
 
 caso_getopt_o:
 	lw	v0, optarg	#llamo a optarg
-	sw	v0, 28($fp)		#el resultado es archivoSalida
-	lw	a0, 28($fp)
+	sw	v0, 36($fp)		#el resultado es archivoSalida
+	lw	a0, 36($fp)
 	la 	a1, STR_GUION
 	la	t9, strcmp	
 	jal 	ra, t9	
@@ -112,7 +115,7 @@ caso_getopt_o:
 	bne	t0, zero, abrir_archivo_salida
 
 abrir_archivo_salida:
-	lw	a0, 28($fp)
+	lw	a0, 36($fp)
 	#move	a0, s3
 	la	a1, WT
 	la	t9, fopen
@@ -132,8 +135,8 @@ caso_getopt_2p:		#seria el caso ':'
 
 
 fin_while_loop:
-	lw	a0, 16($fp)
-	lw	a1, 20($fp)
+	lw	a0, 24($fp)
+	lw	a1, 28($fp)
 	la	a2, FIN_LINEA	
 	la	a3, FIN_LINEA_NUEVA
 	
@@ -148,20 +151,20 @@ fin_while_loop:
 	b	fin_parser
 
 cerrar_archivo_origen:
-	lw	a0, 16($fp)
+	lw	a0, 24($fp)
 	la	t9, fclose
 	jal 	ra, t9
 	
 cerrar_archivo_destino:
-	lw	a0, 20($fp)
+	lw	a0, 28($fp)
 	la	t9, fclose
 	jal 	ra, t9
 
 
 fin_parser:
-	lw 	t0, 16($fp)
+	lw 	t0, 24($fp)
 	bne 	t0, zero, cerrar_archivo_origen
-	lw	t1, 20($fp)
+	lw	t1, 28($fp)
 	bne 	t1, zero, cerrar_archivo_destino
 
 	move 	sp, $fp
@@ -274,6 +277,7 @@ fin_traducirFormato:
 	move	sp,$fp
 	lw	ra,40(sp)
 	lw	$fp,36(sp)
+	lw	gp,32(sp)
 	addu 	sp,sp,48
 	jr	ra
 	.end traducirFormato
@@ -296,8 +300,8 @@ main:
 	sw 	a0, 40($fp)
 	sw 	a1, 44($fp)
 
-  	lw 	a0,40($fp)	#hace falta? ya estan en a0 y a1
-  	lw 	a1,44($fp)
+  	lw 	a0, 40($fp)	
+  	lw 	a1, 44($fp)
 	la 	a2, FIN_LINEA
 	la 	a3, FIN_LINEA_NUEVA
 
