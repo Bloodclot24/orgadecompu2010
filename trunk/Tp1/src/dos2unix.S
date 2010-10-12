@@ -180,7 +180,7 @@ cerrar_archivo_destino:
 
 fin_parser:
 	lw 	t0, 24($fp)
-	blt 	t0, zero, cerrar_archivo_origenz
+	blt 	t0, zero, cerrar_archivo_origen
 
 	move 	sp, $fp
 	lw 	ra, 64(sp)
