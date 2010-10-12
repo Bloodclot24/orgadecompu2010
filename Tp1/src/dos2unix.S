@@ -54,6 +54,67 @@ parser:
 
 	b	while_loop_parser
 
+caso_getopt_i:
+	lw	v0, optarg	#llamo a optarg
+	sw	v0, 36($fp)	#el resultado es archivoEntrada
+	lw	a0, 36($fp)
+	la 	a1, STR_GUION
+	la	t9, strcmp	#se puede usar strcmp?????
+	jal 	ra, t9
+	move	t0, v0		#t0 <- strcmp(archivoEntrada, "-")
+	bne	t0, zero, abrir_archivo_entrada 		
+	b	while_loop_parser
+
+error_abrir_archivo_entrada:
+	#imprimo mensaje de error por stderr
+	li	a0, 2		#2 es salida por stderr
+	la	a1, SN
+	la	a2, error_archivo_origen
+	la	t9, fprintf
+	#jal 	ra, t9	
+	#retorno ERROR_FILE y salgo de la funcion
+	lw	v0, ERROR_FILE
+	b 	fin_parser	
+
+abrir_archivo_entrada:
+	#llamo a fopen	
+	lw	a0, 36($fp)
+	la	a1, RT
+	la	t9, fopen
+	jal 	ra, t9
+	sw	v0, 28($fp)	#el resultado es un origen (FILE*) 
+	beq	v0, zero, error_abrir_archivo_entrada
+	b while_loop_parser
+
+caso_getopt_o:
+	lw	v0, optarg	#llamo a optarg
+	sw	v0, 40($fp)		#el resultado es archivoSalida
+	lw	a0, 40($fp)
+	la 	a1, STR_GUION
+	la	t9, strcmp	
+	jal 	ra, t9	
+	move	t0, v0		#t0 <- strcmp(archivoSalida, "-")
+	bne	t0, zero, abrir_archivo_salida
+	b while_loop_parser
+
+abrir_archivo_salida:
+	lw	a0, 40($fp)
+	la	a1, WT
+	la	t9, fopen
+	jal	ra, t9
+	sw	v0, 24($fp)
+	b	while_loop_parser
+
+caso_getopt_2p:		#seria el caso ':'
+	li	a0, 2		#2 es salida por stderr
+	la	a1, SN
+	la	a2, error_getopt_2p
+	la	t9, fprintf
+	jal 	ra, t9	
+	lw	v0, ERROR_ARG	#??
+	b	fin_parser
+
+
 while_loop_parser:	
 	lw	a0, 72($fp)	#a0 <- argc
 	lw	a1, 76($fp)	#a1 <- argv
@@ -73,68 +134,6 @@ while_loop_parser:
 	li 	t1, 58			# 58 es el caracter ':'
 	beq	t0, t1, caso_getopt_2p
 	#fin del switch
-
-caso_getopt_i:
-	lw	v0, optarg	#llamo a optarg
-	sw	v0, 36($fp)	#el resultado es archivoEntrada
-	lw	a0, 36($fp)
-	la 	a1, STR_GUION
-	la	t9, strcmp	#se puede usar strcmp?????
-	jal 	ra, t9
-	move	t0, v0		#t0 <- strcmp(archivoEntrada, "-")
-	bne	t0, zero, abrir_archivo_entrada 		
-	b	while_loop_parser
-
-abrir_archivo_entrada:
-	#llamo a fopen	
-	lw	a0, 36($fp)
-	la	a1, RT
-	la	t9, fopen
-	jal 	ra, t9
-	sw	v0, 28($fp)	#el resultado es un origen (FILE*) 
-	beq	v0, zero, error_abrir_archivo_entrada
-
-error_abrir_archivo_entrada:
-	#imprimo mensaje de error por stderr
-	li	a0, 2		#2 es salida por stderr
-	la	a1, SN
-	la	a2, error_archivo_origen
-	la	t9, fprintf
-	#jal 	ra, t9	
-	#retorno ERROR_FILE y salgo de la funcion
-	lw	v0, ERROR_FILE
-	b 	fin_parser	
-	
-
-caso_getopt_o:
-	lw	v0, optarg	#llamo a optarg
-	sw	v0, 40($fp)		#el resultado es archivoSalida
-	lw	a0, 40($fp)
-	la 	a1, STR_GUION
-	la	t9, strcmp	
-	jal 	ra, t9	
-	move	t0, v0		#t0 <- strcmp(archivoSalida, "-")
-	bne	t0, zero, abrir_archivo_salida
-
-abrir_archivo_salida:
-	lw	a0, 40($fp)
-	la	a1, WT
-	la	t9, fopen
-	jal	ra, t9
-	sw	v0, 24($fp)
-	b	while_loop
-
-
-
-caso_getopt_2p:		#seria el caso ':'
-	li	a0, 2		#2 es salida por stderr
-	la	a1, SN
-	la	a2, error_getopt_2p
-	la	t9, fprintf
-	jal 	ra, t9	
-	lw	v0, ERROR_ARG	#??
-	b	fin_parser
-
 
 fin_while_loop:
 	la	a0, 28($fp)
