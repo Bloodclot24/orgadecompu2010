@@ -59,10 +59,9 @@ caso_getopt_i:
 	sw	v0, 36($fp)	#el resultado es archivoEntrada
 	lw	a0, 36($fp)
 	la 	a1, STR_GUION
-	la	t9, strcmp	#se puede usar strcmp?????
+	la	t9, strcmp
 	jal 	ra, t9
-	move	t0, v0		#t0 <- strcmp(archivoEntrada, "-")
-	bne	t0, zero, abrir_archivo_entrada 		
+	bne	v0, zero, abrir_archivo_entrada 		
 	b	while_loop_parser
 
 error_abrir_archivo_entrada:
@@ -71,7 +70,7 @@ error_abrir_archivo_entrada:
 	la	a1, SN
 	la	a2, error_archivo_origen
 	la	t9, fprintf
-	#jal 	ra, t9	
+	jal 	ra, t9	
 	#retorno ERROR_FILE y salgo de la funcion
 	lw	v0, ERROR_FILE
 	b 	fin_parser	
@@ -93,9 +92,6 @@ caso_getopt_o:
 	la 	a1, STR_GUION
 	la	t9, strcmp	
 	jal 	ra, t9	
-	
-	#move	t0, v0		#t0 <- strcmp(archivoSalida, "-")
-	###################### ACA no hace falta el move
 	bne	v0, zero, abrir_archivo_salida 
 	b while_loop_parser
 
@@ -113,7 +109,7 @@ caso_getopt_2p:		#seria el caso ':'
 	la	a2, error_getopt_2p
 	la	t9, fprintf
 	jal 	ra, t9	
-	lw	v0, ERROR_ARG	#??
+	lw	v0, ERROR_ARG
 	b	fin_parser
 
 
@@ -285,7 +281,6 @@ fin_traducirFormato:
 	addu 	sp,sp,48
 	jr	ra
 	.end traducirFormato
-
 
 .text
 .align 2
