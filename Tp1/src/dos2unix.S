@@ -216,8 +216,12 @@ traducirFormato:
 
 	# Cargo el argumento para fgetc(origen)
 	lw	a0,48($fp)    # Cargo el argumento fgetc
-	la	t9,fgetc      # Llamo a fgetc
-	jal	ra,t9
+	la	a1,24($fp)    # buffer.
+	li	a2,1	      #Cantidad a leer, leemos de a 1
+	li	v0,14	      #syscall read_file(14)
+	syscall
+#	la	t9,fgetc      # Llamo a fgetc
+#	jal	ra,t9
 	sb	v0,24($fp) 
 
 while_loop:
@@ -237,8 +241,12 @@ loop:
 	sltu	v0,v0,2
 	bne	v0,zero,funcion_fputs  # strlen(finLinea) != 0
 	lw	a0,48($fp)  # Cargo el argumento para fgetc(origen)
-	la	t9,fgetc    
-	jal	ra,t9       # Llamo a fgetc 
+	la	a1,25($fp)    # buffer.
+	li	a2,1	      #Cantidad a leer, leemos de a 1
+	li	v0,14	      #syscall read_file(14)
+	syscall	
+#	la	t9,fgetc    
+#	jal	ra,t9       # Llamo a fgetc 
 	sb	v0,25($fp)    
 	lw	v0,56($fp) 
 	addu	v0,v0,1     
@@ -286,8 +294,12 @@ funcion_fputc:
 
 funcion_fgetc:
 	lw	a0,48($fp)  # Cargo el argumento para fgetc(origen)
-	la	t9,fgetc
-	jal	ra,t9       # Llamo a fgetc(origen) 
+	la	a1,24($fp)    # buffer.
+	li	a2,1	      #Cantidad a leer, leemos de a 1
+	li	v0,14	      #syscall read_file(14)
+	syscall	
+#	la	t9,fgetc
+#	jal	ra,t9       # Llamo a fgetc(origen) 
 	sb	v0,24($fp)
 	b	while_loop
 
