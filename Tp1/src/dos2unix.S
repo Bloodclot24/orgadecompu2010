@@ -40,8 +40,8 @@ parser:
 	sw 	a3, 84($fp)
 
 	# Variables locales
-	li 	t0, 0		#FILE* origen = stdin		
-	li 	t1, 1		#FILE* destino = stdout
+	la 	t0, 0		#FILE* origen = stdin		
+	la 	t1, 1		#FILE* destino = stdout
 	li	t2, 0		#int c
 	li	t3, 0		#char*archivoEntrada
 	li	t4, 0		#char*archivoSalida
@@ -97,9 +97,11 @@ caso_getopt_o:
 
 abrir_archivo_salida:
 	lw	a0, 40($fp)
-	la	a1, WT
-	la	t9, fopen
-	jal	ra, t9
+	la	a1, 1		#flags 	(0 read, 1 write)
+	li	a2, 0		#mode
+	li	v0, 13		#llamo a open_file
+	syscall
+	
 	sw	v0, 28($fp)
 	b	while_loop_parser
 
@@ -107,7 +109,7 @@ caso_getopt_2p:		#seria el caso ':'
 	li	a0, 2		#2 es salida por stderr
 	la	a1, SN
 	la	a2, error_getopt_2p
-	la	t9, fprintf
+	#la	t9, fprintf	#TODO: no llamar a fprintf
 	jal 	ra, t9	
 	lw	v0, ERROR_ARG
 	b	fin_parser
@@ -160,7 +162,9 @@ cerrar_archivo_destino:
     lw    	t1, 28($fp) 
     beq   	t1, zero, fin_parser 
     lw    	a0, 28($fp) 
-    la    	t9, fclose 
+    li		v0, 16	#16 es close	
+    syscall			
+
     jal     	ra, t9
 
 fin_parser:
