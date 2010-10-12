@@ -71,7 +71,7 @@ error_abrir_archivo_entrada:
 	la	a1, SN
 	la	a2, error_archivo_origen
 	la	t9, fprintf
-	#jal 	ra, t9	
+	jal 	ra, t9	
 	#retorno ERROR_FILE y salgo de la funcion
 	lw	v0, ERROR_FILE
 	b 	fin_parser	
@@ -111,7 +111,7 @@ caso_getopt_2p:		#seria el caso ':'
 	la	a2, error_getopt_2p
 	la	t9, fprintf
 	jal 	ra, t9	
-	lw	v0, ERROR_ARG	#??
+	lw	v0, ERROR_ARG	
 	b	fin_parser
 
 
