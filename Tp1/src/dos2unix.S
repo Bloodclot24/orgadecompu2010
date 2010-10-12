@@ -180,7 +180,7 @@ cerrar_archivo_destino:
 
 fin_parser:
 	lw 	t0, 24($fp)
-	bne 	t0, zero, cerrar_archivo_origen
+	blt 	t0, zero, cerrar_archivo_origenz
 
 	move 	sp, $fp
 	lw 	ra, 64(sp)
@@ -253,10 +253,24 @@ loop:
 	lb	v1,25($fp)
 	lb	v0,0(v0)
 	bne	v1,v0,loop2 # if(c2 != finLinea[1])
-	lw	a0,60($fp)  # Cargo el argumento para fputs(finLineaNueva)
-	lw	a1,52($fp)  # Cargo el argumento para fputs(destino)
-	la	t9,fputs     
-	jal	ra,t9       # Llamo a fputs 
+
+#fputs viejo
+#	lw	a0,60($fp)  # Cargo el argumento para fputs(finLineaNueva)
+#	lw	a1,52($fp)  # Cargo el argumento para fputs(destino)
+#	la	t9,fputs     
+#	jal	ra,t9       # Llamo a fputs 
+#fin fputs viejo
+	
+	lw	a0,60($fp)  # Cargo el argumento para strlen(finLineaNueva)    
+	la	t9,strlen   
+	jal	ra,t9
+	move	t0, v0		#almaceno momentaneamente la long. de finLineaNueva
+	li	v0, 15
+	lw	a0, 52($fp)	#file descriptor
+	lw	a1, 60($fp)	#address of output buffer
+	move 	a2, t0		#number of characters to write (el strlen anterior)
+	syscall
+
 	b	funcion_fgetc
 
 loop2:
@@ -278,10 +292,23 @@ loop2:
 	b	funcion_fgetc
 
 funcion_fputs:
-	lw	a0,60($fp)  # Cargo el argumento para fputs(finLineaNueva)
-	lw	a1,52($fp)  # Cargo el argumento para fputs(destino)
-	la	t9,fputs
-	jal	ra,t9       # Llamo a fputs(finLineaNueva, destino)     
+#fputs viejo
+#	lw	a0,60($fp)  # Cargo el argumento para fputs(finLineaNueva)
+#	lw	a1,52($fp)  # Cargo el argumento para fputs(destino)
+#	la	t9,fputs
+#	jal	ra,t9       # Llamo a fputs(finLineaNueva, destino)     
+#fin fputs viejo
+
+	lw	a0,60($fp)  # Cargo el argumento para strlen(finLineaNueva)    
+	la	t9,strlen   
+	jal	ra,t9
+	move	t0, v0		#almaceno momentaneamente la long. de finLineaNueva
+	li	v0, 15
+	lw	a0, 52($fp)
+	lw	a1, 60($fp)
+	move 	a2, t0
+	syscall	
+
 	b	funcion_fgetc
 
 funcion_fputc:
