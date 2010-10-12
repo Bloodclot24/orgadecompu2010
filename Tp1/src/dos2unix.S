@@ -163,19 +163,21 @@ fin_while_loop:
 
 cerrar_archivo_origen: 
     lw		t0, 24($fp) 
-    beq   	t0, zero, cerrar_archivo_destino 
+    blt   	t0, zero, cerrar_archivo_destino 
     lw    	a0, 24($fp) 
-    la    	t9, fclose 
-    jal    	ra, t9 
+    li    	v0, 16 		#syscall close_file 
+    syscall
+
+#    jal    	ra, t9 
 
 cerrar_archivo_destino: 
     lw    	t1, 28($fp) 
-    beq   	t1, zero, fin_parser 
+    blt   	t1, zero, fin_parser 
     lw    	a0, 28($fp) 
     li		v0, 16	#16 es close	
     syscall			
 
-    jal     	ra, t9
+#    jal     	ra, t9
 
 fin_parser:
 	lw 	t0, 24($fp)
