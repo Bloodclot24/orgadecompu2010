@@ -40,8 +40,8 @@ parser:
 	sw 	a3, 84($fp)
 
 	# Variables locales
-	la 	t0, 0		#FILE* origen = stdin		
-	la 	t1, 0		#FILE* destino = stdout
+	li 	t0, 0		#FILE* origen = stdin		
+	li 	t1, 1		#FILE* destino = stdout
 	li	t2, 0		#int c
 	li	t3, 0		#char*archivoEntrada
 	li	t4, 0		#char*archivoSalida
@@ -71,7 +71,7 @@ error_abrir_archivo_entrada:
 	la	a1, SN
 	la	a2, error_archivo_origen
 	la	t9, fprintf
-	jal 	ra, t9	
+	#jal 	ra, t9	
 	#retorno ERROR_FILE y salgo de la funcion
 	lw	v0, ERROR_FILE
 	b 	fin_parser	
@@ -113,7 +113,7 @@ caso_getopt_2p:		#seria el caso ':'
 	la	a2, error_getopt_2p
 	la	t9, fprintf
 	jal 	ra, t9	
-	lw	v0, ERROR_ARG	
+	lw	v0, ERROR_ARG	#??
 	b	fin_parser
 
 
