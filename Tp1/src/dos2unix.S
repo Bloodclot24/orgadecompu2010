@@ -40,17 +40,17 @@ parser:
 	sw 	a3, 84($fp)
 
 	# Variables locales
-	li 	t0, 0		#origen = stdin		
-	li 	t1, 1		#destino = stdout
+	la 	t0, 0		#FILE* origen = stdin		
+	la 	t1, 0		#FILE* destino = stdout
 	li	t2, 0		#int c
-	li	t3, 0		#archivoEntrada
-	li	t4, 0		#archivoSalida
+	li	t3, 0		#char*archivoEntrada
+	li	t4, 0		#char*archivoSalida
 
-	sw	t0, 28($fp)	#guardo primero destino y despues origen
-	sw	t1, 24($fp)
+	sw	t0, 24($fp)
+	sw	t1, 28($fp)
 	sw	t2, 32($fp)
 	sw	t3, 36($fp)
-	sw	t4, 40($fp)	
+	sw	t4, 40($fp)
 
 	b	while_loop_parser
 
@@ -82,7 +82,7 @@ abrir_archivo_entrada:
 	la	a1, RT
 	la	t9, fopen
 	jal 	ra, t9
-	sw	v0, 28($fp)	#el resultado es un origen (FILE*) 
+	sw	v0, 24($fp)	#el resultado es un origen (FILE*) 
 	beq	v0, zero, error_abrir_archivo_entrada
 	b while_loop_parser
 
@@ -93,8 +93,10 @@ caso_getopt_o:
 	la 	a1, STR_GUION
 	la	t9, strcmp	
 	jal 	ra, t9	
-	move	t0, v0		#t0 <- strcmp(archivoSalida, "-")
-	bne	t0, zero, abrir_archivo_salida
+	
+	#move	t0, v0		#t0 <- strcmp(archivoSalida, "-")
+	###################### ACA no hace falta el move
+	bne	v0, zero, abrir_archivo_salida 
 	b while_loop_parser
 
 abrir_archivo_salida:
@@ -102,7 +104,7 @@ abrir_archivo_salida:
 	la	a1, WT
 	la	t9, fopen
 	jal	ra, t9
-	sw	v0, 24($fp)
+	sw	v0, 28($fp)
 	b	while_loop_parser
 
 caso_getopt_2p:		#seria el caso ':'
@@ -136,8 +138,8 @@ while_loop_parser:
 	#fin del switch
 
 fin_while_loop:
-	la	a0, 28($fp)
-	la	a1, 24($fp)
+	la	a0, 24($fp)
+	la	a1, 28($fp)
 	la	a2, FIN_LINEA	
 	la	a3, FIN_LINEA_NUEVA
 	
@@ -151,32 +153,22 @@ fin_while_loop:
 	
 	b	fin_parser
 
-#cerrar_archivo_origen:
-#	lw	a0, 28($fp)
-#	la	t9, fclose
-#	jal 	ra, t9
-	
-#cerrar_archivo_destino:
-#	lw	a0, 24($fp)
-#	la	t9, fclose
-#	jal 	ra, t9
-
 cerrar_archivo_origen: 
-    lw     t0, 24($fp) 
-    beq   t0, zero, cerrar_archivo_destino 
-    lw    a0, 24($fp) 
-    la    t9, fclose 
-    jal    ra, t9 
+    lw		t0, 24($fp) 
+    beq   	t0, zero, cerrar_archivo_destino 
+    lw    	a0, 24($fp) 
+    la    	t9, fclose 
+    jal    	ra, t9 
 
 cerrar_archivo_destino: 
-  lw    t1, 28($fp) 
-  beq   t1, zero, fin_parser 
-  lw    a0, 28($fp) 
-  la    t9, fclose 
-  jal     ra, t9
+    lw    	t1, 28($fp) 
+    beq   	t1, zero, fin_parser 
+    lw    	a0, 28($fp) 
+    la    	t9, fclose 
+    jal     	ra, t9
 
 fin_parser:
-	lw 	t0, 28($fp)
+	lw 	t0, 24($fp)
 	bne 	t0, zero, cerrar_archivo_origen
 
 	move 	sp, $fp
