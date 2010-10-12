@@ -77,13 +77,23 @@ error_abrir_archivo_entrada:
 
 abrir_archivo_entrada:
 	#llamo a fopen	
+	li 	v0,13		#syscall open_file
 	lw	a0, 36($fp)
-	la	a1, RT
-	la	t9, fopen
-	jal 	ra, t9
+	la	a1, 0 		#abro para lectura, flag 0:read
+	la	a2,0 		#el modo es ignorado
+	syscall
 	sw	v0, 24($fp)	#el resultado es un origen (FILE*) 
-	beq	v0, zero, error_abrir_archivo_entrada
+	blt	v0, zero, error_abrir_archivo_entrada
 	b while_loop_parser
+
+	#llamo a fopen	
+#	lw	a0, 36($fp)
+#	la	a1, RT
+#	la	t9, fopen
+#	jal 	ra, t9
+#	sw	v0, 24($fp)	#el resultado es un origen (FILE*) 
+#	beq	v0, zero, error_abrir_archivo_entrada
+#	b while_loop_parser
 
 caso_getopt_o:
 	lw	v0, optarg	#llamo a optarg
