@@ -163,7 +163,7 @@ fin_while_loop:
 
 cerrar_archivo_origen: 
     lw		t0, 24($fp) 
-    blt   	t0, zero, cerrar_archivo_destino 
+    beq   	t0, zero, cerrar_archivo_destino 
     lw    	a0, 24($fp) 
     li    	v0, 16 		#syscall close_file 
     syscall
