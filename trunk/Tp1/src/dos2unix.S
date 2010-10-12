@@ -66,10 +66,10 @@ caso_getopt_i:
 
 error_abrir_archivo_entrada:
 	#imprimo mensaje de error por stderr
-	li	v0, SYS_write       # ver dentro de <sys/syscall.h>.
-	li	a0, 2               # stderr
-	la	a1, ($fp) # mensaje error
-	li	a2, 30	            # data length
+	li	v0,SYS_write       # ver dentro de <sys/syscall.h>.
+	li	a0,2               # stderr
+	la	a1,error_archivo_origen($fp) # mensaje error
+	li	a2,30	            # data length
 	syscall
 	#retorno ERROR_FILE y salgo de la funcion
 	lw	v0, ERROR_FILE
@@ -116,10 +116,10 @@ abrir_archivo_salida:
 	b	while_loop_parser
 
 caso_getopt_2p:		#seria el caso ':'
-	li	v0, SYS_write       # ver dentro de <sys/syscall.h>.
-	li	a0, 2               # stderr
-	la	a1, error_getopt_2p($fp) # mensaje error
-	li	a2, 51	            # data length
+	li	v0,SYS_write       # ver dentro de <sys/syscall.h>.
+	li	a0,2               # stderr
+	la	a1,error_getopt_2p($fp) # mensaje error
+	li	a2,51	            # data length
 	syscall
 	b	fin_parser
 
@@ -252,11 +252,11 @@ loop:
 	b	funcion_fgetc
 
 loop2:
-	lb	v0,24($fp)     
-	move	a0,v0       # Cargo el argumento para fputc(c)
-	lw	a1,52($fp)  # Cargo el argumento para fputc(destino)
-	la	t9,fputc        
-	jal	ra,t9	    # Llamo a fputc(c, destino)
+	li   $v0,15         # system call for write to file
+	move $a0,52($fp)    # file descriptor 
+	la   $a1,24($fp)    # address of buffer from which to write
+	li   $a2,1          # hardcoded buffer length
+	syscall             # write to file
 	lb	v1,25($fp)
 	li	v0,-1
 	beq	v1,v0,funcion_fgetc    # if(c2 == EOF)
@@ -275,11 +275,11 @@ funcion_fputs:
 	b	funcion_fgetc
 
 funcion_fputc:
-	lb	v0,24($fp)  
-	move	a0,v0       # Cargo el argumento para fputc(c)
-	lw	a1,52($fp)  # Cargo el argumento para fputc(destino)
-	la	t9,fputc 
-	jal	ra,t9       # Llamo a fputc(c, destino)
+	li   $v0,15         # system call for write to file
+	move $a0,52($fp)    # file descriptor 
+	la   $a1,24($fp)    # address of buffer from which to write
+	li   $a2,1          # hardcoded buffer length
+	syscall             # write to file
 
 funcion_fgetc:
 	lw	a0,48($fp)  # Cargo el argumento para fgetc(origen)
