@@ -228,8 +228,8 @@ while_loop:
 	lb	v1,24($fp)    # sizeof(c) = 1; 1 byte
 #	li	v0,-1
 #	bne	v1,v0,loop    # c != EOF
-	li	v0,-1
-	blez 	v1,v0,loop    # c != EOF
+	li	v0,1
+	blt 	v1,v0,loop    # c != EOF
 	b	fin_traducirFormato
 
 loop:
