@@ -222,7 +222,7 @@ traducirFormato:
 	syscall
 #	la	t9,fgetc      # Llamo a fgetc
 #	jal	ra,t9
-	sb	v0,24($fp) 
+#	sb	v0,24($fp) 
 
 while_loop:
 	lb	v1,24($fp)    # sizeof(c) = 1; 1 byte
@@ -247,7 +247,7 @@ loop:
 	syscall	
 #	la	t9,fgetc    
 #	jal	ra,t9       # Llamo a fgetc 
-	sb	v0,25($fp)    
+#	sb	v0,25($fp)    
 	lw	v0,56($fp) 
 	addu	v0,v0,1     
 	lb	v1,25($fp)
@@ -327,7 +327,7 @@ funcion_fgetc:
 	syscall	
 #	la	t9,fgetc
 #	jal	ra,t9       # Llamo a fgetc(origen) 
-	sb	v0,24($fp)
+#	sb	v0,24($fp)
 	b	while_loop
 
 fin_traducirFormato:
