@@ -252,19 +252,21 @@ loop:
 	b	funcion_fgetc
 
 loop2:
-	li   $v0,15         # system call for write to file
-	move $a0,52($fp)    # file descriptor 
-	la   $a1,24($fp)    # address of buffer from which to write
-	li   $a2,1          # hardcoded buffer length
+	li   v0,15         # system call for write to file
+	#####move a0,52($fp)    # file descriptor 
+	la   a0,52($fp)
+	la   a1,24($fp)    # address of buffer from which to write
+	li   a2,1          # hardcoded buffer length
 	syscall             # write to file
 	lb	v1,25($fp)
 	li	v0,-1
 	beq	v1,v0,funcion_fgetc    # if(c2 == EOF)
-	lb	v0,25($fp)
-	move	a0,v0       # Cargo el argumento para fputc(c2)
-	lw	a1,52($fp)  # Cargo el argumento para fputc(destino)
-	la	t9,fputc     
-	jal	ra,t9       # Llamo fputc(c2, destino)  
+	li   v0,15         # system call for write to file
+	#####move a0,52($fp)    # file descriptor 
+	la   a0,52($fp)
+	la   a1,25($fp)    # address of buffer from which to write
+	li   a2,1          # hardcoded buffer length
+	syscall             # write to file
 	b	funcion_fgetc
 
 funcion_fputs:
@@ -275,10 +277,11 @@ funcion_fputs:
 	b	funcion_fgetc
 
 funcion_fputc:
-	li   $v0,15         # system call for write to file
-	move $a0,52($fp)    # file descriptor 
-	la   $a1,24($fp)    # address of buffer from which to write
-	li   $a2,1          # hardcoded buffer length
+	li   v0,15         # system call for write to file
+	#move a0,52($fp)    # file descriptor 
+	la   a0,52($fp)
+	la   a1,24($fp)    # address of buffer from which to write
+	li   a2,1          # hardcoded buffer length
 	syscall             # write to file
 
 funcion_fgetc:
