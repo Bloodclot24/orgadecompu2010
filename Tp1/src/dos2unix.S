@@ -66,11 +66,11 @@ caso_getopt_i:
 
 error_abrir_archivo_entrada:
 	#imprimo mensaje de error por stderr
-	li	a0, 2		#2 es salida por stderr
-	la	a1, SN
-	la	a2, error_archivo_origen
-	la	t9, fprintf
-	jal 	ra, t9	
+	li	v0, SYS_write       # ver dentro de <sys/syscall.h>.
+	li	a0, 2               # stderr
+	la	a1, ($fp) # mensaje error
+	li	a2, 30	            # data length
+	syscall
 	#retorno ERROR_FILE y salgo de la funcion
 	lw	v0, ERROR_FILE
 	b 	fin_parser	
@@ -116,12 +116,11 @@ abrir_archivo_salida:
 	b	while_loop_parser
 
 caso_getopt_2p:		#seria el caso ':'
-	li	a0, 2		#2 es salida por stderr
-	la	a1, SN
-	la	a2, error_getopt_2p
-	#la	t9, fprintf	#TODO: no llamar a fprintf
-	jal 	ra, t9	
-	lw	v0, ERROR_ARG
+	li	v0, SYS_write       # ver dentro de <sys/syscall.h>.
+	li	a0, 2               # stderr
+	la	a1, error_getopt_2p($fp) # mensaje error
+	li	a2, 51	            # data length
+	syscall
 	b	fin_parser
 
 
