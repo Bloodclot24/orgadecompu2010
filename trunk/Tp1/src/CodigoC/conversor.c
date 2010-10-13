@@ -8,17 +8,17 @@
 #define ERROR_WRITE 2
 #define ERROR_ARGS 3
 
-int traducirFormato(int argc, char *finLinea, char *finLineaNueva){
+int conversor(int argc, char *finLinea, char *finLineaNueva){
     if(argc > 1) return ERROR_ARGS;
-    FILE* destino = stdout;
     FILE* origen = stdin;
+    FILE* destino = stdout;
     int val_escritura = 0;  
     int retorno = EXIT_SUCCESS;
-    char c = fgetc(origen);
+    char c2, c = fgetc(origen);
     while((c != EOF) && !ferror(origen) && (val_escritura != EOF)){        
         if(c == finLinea[0]){
             if(strlen(finLinea) > 1){
-                char c2 = fgetc(origen);
+                c2 = fgetc(origen);
                 if(!ferror(origen)) {
 		  if(c2 == finLinea[1]){
 		      val_escritura = fputs(finLineaNueva, destino);
