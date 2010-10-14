@@ -3,26 +3,15 @@
 
 ############ CONSTANTES ############
 .rdata
-  FIN_LINEA: 		.asciiz "\n"
-  FIN_LINEA_NUEVA:	.asciiz "\r\n"
+  FIN_LINEA: 			.asciiz "\n"
+  FIN_LINEA_NUEVA:		.asciiz "\r\n"
+  LENGHT_FIN_LINEA_NUEVA:	.word 2	
 
   # Codigos de retorno
   EXIT_SUCCESS:		.word 0
   ERROR_READ:		.word 1
   ERROR_WRITE:		.word 2
   ERROR_ARGS:		.word 3
-  
-  ######### PRUEBAS ##############
-  MAIN:			 .asciiz "En MAIN: Antes del parser.\n"	
-  MAIN2:                 .asciiz "En MAIN:  Sali del parser.\n"	
-  CONVERSOR1:            .asciiz "En            conversor...\n"
-  CONVERSOR2:            .asciiz "Saliendo      conversor...\n"	
-  CONVERSOR3:            .asciiz "Error args                \n"		
-  CONVERSOR4:		 .asciiz "Verificando errores       \n"	
-  CONVERSOR5:            .asciiz "fin linea                 \n"
-  CONVERSOR6:            .asciiz "poner fin linea dos       \n"	
-  	
-  ##################
 
 ############ FIN CONSTANTES ############
 
@@ -87,7 +76,7 @@ while_loop:
 	lw	t1,76($fp)
 	lb	t0,41($fp)
 	lb	t1,0(t1)
-	beq	t0,t1,verificar_fin_linea
+	beq	t0,t1,cambiar_fin_linea
 	
 	# Escribo caracter
 	li	v0,SYS_write
@@ -109,24 +98,8 @@ leer_otro_caracter:
 
 	b	while_loop
 
-verificar_fin_linea:
-	###################### Strlen provisorio
-	li	v0,1
-	###################    
-
-	# strlen(finLinea) <=  1
-	li	t0,1
-	ble	v0,t0,poner_fin_linea_dos
-
-
-
-
-	b 	leer_otro_caracter
-
-poner_fin_linea_dos:
-	################ Strlen provisorio
-	li	t0,2
-        #########################
+cambiar_fin_linea:
+	lw	t0,LENGHT_FIN_LINEA_NUEVA
 
 	# Escribo fin de linea dos
 	li	v0,SYS_write
