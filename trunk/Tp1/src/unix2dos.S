@@ -5,15 +5,9 @@
 .rdata
   FIN_LINEA: 		.asciiz "\n"
   FIN_LINEA_NUEVA:	.asciiz "\r\n"
-  STR_GUION:		.asciiz "-"
-  OPCIONES:		.asciiz "i:o:"
-  RT:			.asciiz "rt"
-  WT:			.asciiz "wt"
-  SN:			.asciiz "%s\n"  
 
   # Codigos de retorno
   EXIT_SUCCESS:		.word 0
-
   ERROR_READ:		.word 1
   ERROR_WRITE:		.word 2
   ERROR_ARGS:		.word 3
@@ -23,7 +17,11 @@
   MAIN2:                 .asciiz "En MAIN:  Sali del parser.\n"	
   CONVERSOR1:            .asciiz "En            conversor...\n"
   CONVERSOR2:            .asciiz "Saliendo      conversor...\n"	
-  CONVERSOR3:            .asciiz "Error args                \n"			
+  CONVERSOR3:            .asciiz "Error args                \n"		
+  CONVERSOR4:		 .asciiz "Verificando errores       \n"	
+  CONVERSOR5:            .asciiz "fin linea                 \n"
+  CONVERSOR6:            .asciiz "poner fin linea dos       \n"	
+  	
   ##################
 
 ############ FIN CONSTANTES ############
@@ -49,20 +47,13 @@ conversor:
 	sw	a1,76($fp) # finLinea
 	sw	a2,80($fp) # finLineaNueva
 	
-	######## PRUEBA
-	
-	li	v0,SYS_write       # ver dentro de <sys/syscall.h>.
-	li	a0,1               # a0: standard output file descriptor.
-	la	a1,CONVERSOR1	
-	li	a2,28	 	           # a2: data length 
-	syscall
-	########################
-
 	# Stack frame
 	li	t0,0        
 	sw	t0,24($fp)  # origen 
-	li 	t0,0	   
+	li 	t0,1	   
 	sw	t0,28($fp)  # destino	
+	li	t0,0
+	sw	t0,32($fp)  # val_escritura
 	lw	t0,EXIT_SUCCESS
 	sw	t0,36($fp)  # retorno
 	
@@ -73,122 +64,98 @@ conversor:
 	
 	# Obtengo el primer caracter
 	li	v0,SYS_read
-	li	a0,1
-	la	a1,25($fp)
-	li	a2,2
+	lw	a0,24($fp)
+	la	a1,41($fp)
+	li	a2,1
 	syscall
-	
-	b 	fin_conversor
 
 while_loop:
-	lb	v1,24($fp)    # sizeof(c) = 1; 1 byte
-	li	v0,1
-	blt 	v1,v0,loop    # c != EOF
-	b	fin_conversor
+	## Condiciones de loop
+	# Verifico c == EOF
+	beq	v0,zero,fin_conversor		
+	
+    	# Verifico ferror(origen)
+	blt	v0,zero,error_lectura
+	
+	# Verifico val_escritura != EOF
+	lw	t1,32($fp)
+	blt	t1,zero,error_escritura	
+	## fin condiciones de loop
 
-loop:
-	lw	v0,56($fp)
-	lb	v1,24($fp)
-	lb	v0,0(v0)
-	bne	v1,v0,funcion_fputc    # if(c != finLinea[0])
-	lw	a0,56($fp)  # Cargo el argumento para strlen(finLinea)    
-	la	t9,strlen   
-	jal	ra,t9       # Llamo a strlen 
-	sltu	v0,v0,2
-	bne	v0,zero,funcion_fputs  # strlen(finLinea) != 0
-	li	v0,SYS_read	      #syscall read_file(14)
-	lw	a0,48($fp)  # Cargo el argumento para fgetc(origen)
-	la	a1,25($fp)    # buffer.
-	li      a2,1  
-	syscall	
-	sb	v0,25($fp)    
-	lw	v0,56($fp) 
-	addu	v0,v0,1     
-	lb	v1,25($fp)
-	lb	v0,0(v0)
-	bne	v1,v0,loop2 # if(c2 != finLinea[1])
-
-	lw	a0,60($fp)  # Cargo el argumento para strlen(finLineaNueva)    
-	la	t9,strlen   
-	jal	ra,t9
-	move	t0, v0		#almaceno momentaneamente la long. de finLineaNueva
-
+	## Verifico si es fin linea
+	# c == finLinea[0]
+	lw	t1,76($fp)
+	lb	t0,41($fp)
+	lb	t1,0(t1)
+	beq	t0,t1,verificar_fin_linea
+	
+	# Escribo caracter
 	li	v0,SYS_write
-	lw	a0,52($fp)	#file descriptor
-	lw	a1,60($fp)	#address of output buffer
-	move 	a2,t0		#number of characters to write (el strlen anterior)
+	lw	a0,28($fp)
+	la	a1,41($fp)
+	li	a2,1
+	syscall	
+
+	# Guardo val_escritura
+	sw	v0,32($fp)
+
+leer_otro_caracter:
+	# Leo otro caracter
+	li	v0,SYS_read
+	lw	a0,24($fp)
+	la	a1,41($fp)
+	li	a2,1
 	syscall
 
-	b	funcion_fgetc
-
-loop2:
-	li   	v0,SYS_write         # system call for write to file
-	la  	a0,52($fp)
-	la   	a1,24($fp)    # address of buffer from which to write
-	li   	a2,1          # hardcoded buffer length
-	syscall             # write to file
-	lb	v1,25($fp)
-	li	v0,-1
-	beq	v1,v0,funcion_fgetc    # if(c2 == EOF)
-	li	v0,SYS_write         # system call for write to file
-	la   	a0,52($fp)
-	la   	a1,25($fp)    # address of buffer from which to write
-	li   	a2,1          # hardcoded buffer length
-	syscall             # write to file
-	b	funcion_fgetc
-
-funcion_fputs:
-	lw	a0,60($fp)  # Cargo el argumento para strlen(finLineaNueva)    
-	la	t9,strlen   
-	jal	ra,t9
-	move	t0,v0		#almaceno momentaneamente la long. de finLineaNueva
-	li	v0,SYS_write
-	lw	a0,52($fp)
-	lw	a1,60($fp)
-	move 	a2,t0
-	syscall	
-
-	b	funcion_fgetc
-
-funcion_fputc:
-	li   	v0,SYS_write         # system call for write to file
-	la   	a0,52($fp)
-	la   	a1,24($fp)    # address of buffer from which to write
-	li   	a2,1          # hardcoded buffer length
-	syscall             # write to file
-
-funcion_fgetc:
-	li	v0,SYS_read	      #syscall read_file(14)
-	lw	a0,48($fp)  # Cargo el argumento para fgetc(origen)
-	la	a1,24($fp)    # buffer.
-	li	a2,1	      #Cantidad a leer, leemos de a 1
-	syscall	
-	#sb	v0,24($fp)
 	b	while_loop
 
-error_cantidad_argumentos:
-	######### PRUEBA
-	li	v0,SYS_write
-	li	a0,1
-	la	a1,CONVERSOR3
-	li	a2,28
-	syscall
+verificar_fin_linea:
+	###################### Strlen provisorio
+	li	v0,1
+	###################    
 
-	###########		
+	# strlen(finLinea) <=  1
+	li	t0,1
+	ble	v0,t0,poner_fin_linea_dos
+
+
+
+
+	b 	leer_otro_caracter
+
+poner_fin_linea_dos:
+	################ Strlen provisorio
+	li	t0,2
+        #########################
+
+	# Escribo fin de linea dos
+	li	v0,SYS_write
+	lw	a0,28($fp)
+	lw	a1,80($fp)
+	move	a2,t0
+	syscall
 	
+	# Guardo val_escritura
+	sw	v0,32($fp)	
+
+	b	leer_otro_caracter	
+
+error_cantidad_argumentos:
 	lw	t0,ERROR_ARGS
 	sw	t0,36($fp)
 	b	fin_conversor
 
-fin_conversor:
-	######## PRUEBA
-	li	v0,SYS_write       # ver dentro de <sys/syscall.h>.
-	li	a0,1               # a0: standard output file descriptor.
-	la	a1,CONVERSOR2      # caracter a imprimir
-	li	a2,28 	           # a2: data length 
-	syscall
-	########################
+error_lectura:
+	lw	t0,ERROR_READ
+	sw	t0,36($fp)
+	b	fin_conversor
 
+error_escritura:
+	lw	t0,ERROR_WRITE
+	sw	t0,36($fp)
+	b	fin_conversor
+
+fin_conversor:
 	# Valor de retorno
 	lw	v0,36($fp)
 	
@@ -227,25 +194,9 @@ main:
   	la 	a1,FIN_LINEA
 	la 	a2,FIN_LINEA_NUEVA
 
-	######## PRUEBA
-	#li	v0,SYS_write       # ver dentro de <sys/syscall.h>.
-	#li	a0,1               # a0: standard output file descriptor.
-	#la	a1,MAIN            # caracter a imprimir
-	#li	a2,28 	           # a2: data length 
-	#syscall
-	########################
-
 	# Llamo a la funcion parser
 	la	t9,conversor
 	jal	ra,t9
-
-	######## PRUEBA
-	#li	v0,SYS_write # ver dentro de <sys/syscall.h>.
-	#li	a0,1         # a0: standard output file descriptor.
-	#la	a1,MAIN2       # caracter a imprimir
-	#li	a2,28	      # a2: data length (1 bytes).
-	#syscall
-	########################
 
 	# Liberar stack frame
 	move	sp,$fp
