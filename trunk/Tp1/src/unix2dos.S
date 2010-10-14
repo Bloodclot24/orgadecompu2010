@@ -1,7 +1,7 @@
 #include <mips/regdef.h>
 #include <sys/syscall.h>
 
-########################### CONSTANTES ###########################
+############ CONSTANTES ############
 .rdata
   FIN_LINEA: 		.asciiz "\n"
   FIN_LINEA_NUEVA:	.asciiz "\r\n"
@@ -12,22 +12,23 @@
   SN:			.asciiz "%s\n"  
 
   # Codigos de retorno
-  EXIT_SUCCESS:		.byte 0
-  ERROR_READ:		.byte 1
-  ERROR_WRITE:		.byte 2
-  ERROR_ARGS		.byte 3
+  EXIT_SUCCESS:		.word 0
+
+  ERROR_READ:		.word 1
+  ERROR_WRITE:		.word 2
+  ERROR_ARGS:		.word 3
   
   ######### PRUEBAS ##############
-  PRUEBA:                .asciiz "Saliendo           parser.\n"	
   MAIN:			 .asciiz "En MAIN: Antes del parser.\n"	
   MAIN2:                 .asciiz "En MAIN:  Sali del parser.\n"	
-  PARSER:                .asciiz "En               Parser...\n"
-  LOOP:			 .asciiz "An el while ..............\n"	
+  CONVERSOR1:            .asciiz "En            conversor...\n"
+  CONVERSOR2:            .asciiz "Saliendo      conversor...\n"	
+  CONVERSOR3:            .asciiz "Error args                \n"			
   ##################
 
-########################## FIN CONSTANTES ##########################
+############ FIN CONSTANTES ############
 
-############################ conversor ############################
+############ conversor ############
 .text
 .align 2
 .global conversor
@@ -35,27 +36,49 @@
 
 conversor:
 	# Iniciar stack frame
-  	.frame $fp,48,ra
-	subu	sp,sp,48
-	.cprestore 32
-	sw	gp,32(sp)
-	sw	$fp,36(sp)
-	sw	ra,40(sp)
+  	.frame	$fp,72,ra
+	subu	sp,sp,72
+	.cprestore 56
+	sw	gp,56(sp)
+	sw	$fp,60(sp)
+	sw	ra,64(sp)
 	move	$fp,sp
 
 	# Argumentos recibidos
-	sw	a0,48($fp) # origen
-	sw	a1,52($fp) # destino
-	sw	a2,56($fp) # finLinea
-	sw	a3,60($fp) # finLineaNueva
-
-	# Cargo el argumento para fgetc(origen)
-	li	v0,SYS_read	      #syscall read_file(14)
-	lw	a0,48($fp)    # Cargo el argumento fgetc
-	la	a1,24($fp)    # buffer.
-	li	a2,1  
-	li	a2,1	      #Cantidad a leer, leemos de a 1
+	sw	a0,72($fp) # argc
+	sw	a1,76($fp) # finLinea
+	sw	a2,80($fp) # finLineaNueva
+	
+	######## PRUEBA
+	
+	li	v0,SYS_write       # ver dentro de <sys/syscall.h>.
+	li	a0,1               # a0: standard output file descriptor.
+	la	a1,CONVERSOR1	
+	li	a2,28	 	           # a2: data length 
 	syscall
+	########################
+
+	# Stack frame
+	li	t0,0        
+	sw	t0,24($fp)  # origen 
+	li 	t0,0	   
+	sw	t0,28($fp)  # destino	
+	lw	t0,EXIT_SUCCESS
+	sw	t0,36($fp)  # retorno
+	
+        # Verifico la cantidad de argumentos	
+	lw	t0,72($fp)
+	li	t1,1
+	bgt	t0,t1,error_cantidad_argumentos
+	
+	# Obtengo el primer caracter
+	li	v0,SYS_read
+	li	a0,1
+	la	a1,25($fp)
+	li	a2,2
+	syscall
+	
+	b 	fin_conversor
 
 while_loop:
 	lb	v1,24($fp)    # sizeof(c) = 1; 1 byte
@@ -143,18 +166,43 @@ funcion_fgetc:
 	#sb	v0,24($fp)
 	b	while_loop
 
+error_cantidad_argumentos:
+	######### PRUEBA
+	li	v0,SYS_write
+	li	a0,1
+	la	a1,CONVERSOR3
+	li	a2,28
+	syscall
+
+	###########		
+	
+	lw	t0,ERROR_ARGS
+	sw	t0,36($fp)
+	b	fin_conversor
+
 fin_conversor:
+	######## PRUEBA
+	li	v0,SYS_write       # ver dentro de <sys/syscall.h>.
+	li	a0,1               # a0: standard output file descriptor.
+	la	a1,CONVERSOR2      # caracter a imprimir
+	li	a2,28 	           # a2: data length 
+	syscall
+	########################
+
+	# Valor de retorno
+	lw	v0,36($fp)
+	
 	# Liberar stack frame
 	move	sp,$fp
-	lw	ra,40(sp)
-	lw	$fp,36(sp)
-	lw	gp,32(sp)
-	addu 	sp,sp,48
+	lw	ra,64(sp)
+	lw	$fp,60(sp)
+	lw	gp,56(sp)
+	addu 	sp,sp,72
 	jr	ra
 	.end conversor
-########################### FIN conversor ###########################
+############ FIN conversor ############
 
-################################ Main ################################
+############ Main ############
 .text
 .align 2
 .globl main
@@ -180,11 +228,11 @@ main:
 	la 	a2,FIN_LINEA_NUEVA
 
 	######## PRUEBA
-	li	v0,SYS_write       # ver dentro de <sys/syscall.h>.
-	li	a0,1               # a0: standard output file descriptor.
-	la	a1,MAIN            # caracter a imprimir
-	li	a2,28 	           # a2: data length 
-	syscall
+	#li	v0,SYS_write       # ver dentro de <sys/syscall.h>.
+	#li	a0,1               # a0: standard output file descriptor.
+	#la	a1,MAIN            # caracter a imprimir
+	#li	a2,28 	           # a2: data length 
+	#syscall
 	########################
 
 	# Llamo a la funcion parser
@@ -192,11 +240,11 @@ main:
 	jal	ra,t9
 
 	######## PRUEBA
-	li	v0,SYS_write # ver dentro de <sys/syscall.h>.
-	li	a0,1         # a0: standard output file descriptor.
-	la	a1,MAIN2       # caracter a imprimir
-	li	a2,28	      # a2: data length (1 bytes).
-	syscall
+	#li	v0,SYS_write # ver dentro de <sys/syscall.h>.
+	#li	a0,1         # a0: standard output file descriptor.
+	#la	a1,MAIN2       # caracter a imprimir
+	#li	a2,28	      # a2: data length (1 bytes).
+	#syscall
 	########################
 
 	# Liberar stack frame
@@ -207,4 +255,4 @@ main:
 	addu	sp,sp,40
 	jr	ra
 .end main	
-############################## FIN Main ##############################
+############ FIN Main ############
