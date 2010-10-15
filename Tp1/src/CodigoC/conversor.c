@@ -10,32 +10,30 @@
 
 int conversor(int argc, char *finLinea, char *finLineaNueva){
     if(argc > 1) return ERROR_ARGS;
-    FILE* origen = stdin;
-    FILE* destino = stdout;
     int val_escritura = 0;  
     int retorno = EXIT_SUCCESS;
-    char c2, c = fgetc(origen);
-    while((c != EOF) && !ferror(origen) && (val_escritura != EOF)){        
+    char c2, c = fgetc(stdin);
+    while((c != EOF) && !ferror(stdin) && (val_escritura != EOF)){        
         if(c == finLinea[0]){
             if(strlen(finLinea) > 1){
-                c2 = fgetc(origen);
-                if(!ferror(origen)) {
+                c2 = fgetc(stdin);
+                if(!ferror(stdin)) {
 		  if(c2 == finLinea[1]){
-		      val_escritura = fputs(finLineaNueva, destino);
+		      val_escritura = fputs(finLineaNueva, stdout);
 		  }else{
-		      val_escritura = fputc(c, destino);
-		      if(c2 != EOF && val_escritura != EOF) val_escritura = fputc(c2, destino);
+		      val_escritura = fputc(c, stdout);
+		      if(c2 != EOF && val_escritura != EOF) val_escritura = fputc(c2, stdout);
 		  }
 		}
             }else{
-                val_escritura = fputs(finLineaNueva, destino);
+                val_escritura = fputs(finLineaNueva, stdout);
             }
         }else{
-            val_escritura = fputc(c, destino);
+            val_escritura = fputc(c, stdout);
         }
-        c = fgetc(origen);
+        c = fgetc(stdin);
     } 
-    if(ferror(origen)) retorno = ERROR_READ;
+    if(ferror(stdin)) retorno = ERROR_READ;
     if(val_escritura == EOF) retorno = ERROR_WRITE;   
     return retorno;
 }

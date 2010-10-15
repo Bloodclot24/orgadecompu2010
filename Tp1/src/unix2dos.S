@@ -23,38 +23,34 @@
 
 conversor:
 	# Iniciar stack frame
-  	.frame	$fp,72,ra
-	subu	sp,sp,72
-	.cprestore 56
-	sw	gp,56(sp)
-	sw	$fp,60(sp)
-	sw	ra,64(sp)
+  	.frame	$fp,56,ra
+	subu	sp,sp,56
+	.cprestore 40
+	sw	gp,40(sp)
+	sw	$fp,44(sp)
+	sw	ra,48(sp)
 	move	$fp,sp
 
 	# Argumentos recibidos
-	sw	a0,72($fp) # argc
-	sw	a1,76($fp) # finLinea
-	sw	a2,80($fp) # finLineaNueva
+	sw	a0,56($fp) # argc
+	sw	a1,60($fp) # finLinea
+	sw	a2,64($fp) # finLineaNueva
 	
 	# Stack frame
-	li	t0,0        
-	sw	t0,24($fp)  # origen 
-	li 	t0,1	   
-	sw	t0,28($fp)  # destino	
-	li	t0,0
-	sw	t0,32($fp)  # val_escritura
+ 	li	t0,0
+	sw	t0,24($fp)  # val_escritura
 	lw	t0,EXIT_SUCCESS
-	sw	t0,36($fp)  # retorno
+	sw	t0,28($fp)  # retorno
 	
         # Verifico la cantidad de argumentos	
-	lw	t0,72($fp)
+	lw	t0,56($fp)
 	li	t1,1
 	bgt	t0,t1,error_cantidad_argumentos
 	
 	# Obtengo el primer caracter
 	li	v0,SYS_read
-	lw	a0,24($fp)
-	la	a1,41($fp)
+	li	a0,0
+	la	a1,32($fp)
 	li	a2,1
 	syscall
 
@@ -67,32 +63,32 @@ while_loop:
 	blt	v0,zero,error_lectura
 	
 	# Verifico val_escritura != EOF
-	lw	t1,32($fp)
+	lw	t1,24($fp)
 	blt	t1,zero,error_escritura	
 	## fin condiciones de loop
 
 	## Verifico si es fin linea
 	# c == finLinea[0]
-	lw	t1,76($fp)
-	lb	t0,41($fp)
+	lw	t1,60($fp)
+	lb	t0,32($fp)
 	lb	t1,0(t1)
 	beq	t0,t1,cambiar_fin_linea
 	
 	# Escribo caracter
 	li	v0,SYS_write
-	lw	a0,28($fp)
-	la	a1,41($fp)
+	li	a0,1
+	la	a1,32($fp)
 	li	a2,1
 	syscall	
 
 	# Guardo val_escritura
-	sw	v0,32($fp)
+	sw	v0,24($fp)
 
 leer_otro_caracter:
 	# Leo otro caracter
 	li	v0,SYS_read
-	lw	a0,24($fp)
-	la	a1,41($fp)
+	li	a0,0
+	la	a1,32($fp)
 	li	a2,1
 	syscall
 
@@ -103,41 +99,41 @@ cambiar_fin_linea:
 
 	# Escribo fin de linea dos
 	li	v0,SYS_write
-	lw	a0,28($fp)
-	lw	a1,80($fp)
+	li	a0,1
+	lw	a1,64($fp)
 	move	a2,t0
 	syscall
 	
 	# Guardo val_escritura
-	sw	v0,32($fp)	
+	sw	v0,24($fp)	
 
 	b	leer_otro_caracter	
 
 error_cantidad_argumentos:
 	lw	t0,ERROR_ARGS
-	sw	t0,36($fp)
+	sw	t0,28($fp)
 	b	fin_conversor
 
 error_lectura:
 	lw	t0,ERROR_READ
-	sw	t0,36($fp)
+	sw	t0,28($fp)
 	b	fin_conversor
 
 error_escritura:
 	lw	t0,ERROR_WRITE
-	sw	t0,36($fp)
+	sw	t0,28($fp)
 	b	fin_conversor
 
 fin_conversor:
 	# Valor de retorno
-	lw	v0,36($fp)
+	lw	v0,24($fp)
 	
 	# Liberar stack frame
 	move	sp,$fp
-	lw	ra,64(sp)
-	lw	$fp,60(sp)
-	lw	gp,56(sp)
-	addu 	sp,sp,72
+	lw	ra,48(sp)
+	lw	$fp,44(sp)
+	lw	gp,40(sp)
+	addu 	sp,sp,56
 	jr	ra
 	.end conversor
 ############ FIN conversor ############
