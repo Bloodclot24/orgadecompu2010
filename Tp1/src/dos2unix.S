@@ -3,7 +3,7 @@
 
 ############ CONSTANTES ############
 .rdata
-  FIN_LINEA: 			.asciiz "r\n"
+  FIN_LINEA: 			.asciiz "\r\n"
   FIN_LINEA_NUEVA:		.asciiz "\n"
   LENGHT_FIN_LINEA_NUEVA:	.word 1	
 
@@ -104,9 +104,10 @@ verifico_si_es_fin_linea:
 
 	# Si el caracter que sigue completa el
 	# fin de linea
-	lw	t1,60($fp)
+	# c2 == finLinea[1]
+	lw	t1,60($fp)	
 	lb	t0,33($fp)
-	lb	t1,1($fp)
+	lb	t1,1(t1)
 	beq	t0,t1,cambiar_fin_linea
 	
 	# Escribo caracter1
@@ -120,7 +121,7 @@ verifico_si_es_fin_linea:
 	sw	v0,24($fp)
 	
 	# Verifico error de escritura
-	blt	v0,zero,leer_otro_caracter 	
+	blt	v0,zero,error_escritura
 
 	# Verifico si el caracter2 es eof
 	beq    	v0,zero,leer_otro_caracter
