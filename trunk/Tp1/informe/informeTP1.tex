@@ -105,14 +105,44 @@
 \section{Ejecutando los programas en NetBSD}
   Para ejecutar el programa, el comando a utilizar es:
   \newline
-  {\bf./[nombre de ejecutable] -i [ruta de archivo origen] -o [ruta de archivo destino]}
+  {\bf ./[nombre de ejecutable]}
   \newline
-  En caso de que no se utilicen las opciones {\bf ``-i''} (archivo de entrada) y {\bf ``-o''} (archivo de salida) el 
-  programa utiliza la entrada estandar (stdin) y salida estandar (stdout). Para ver ejemplos, observar 
-  secci\'on de casos de prueba.
+  A diferencia del pr\'actico 0, en este solo se utiliza como entrada stdin, y como salida stdout.
 
 \section{Casos de prueba}
-  TODO
+  Para la prueba de los programas se utilizaron los mismos archivos del pr\'actico anterior y se agregaron los casos de prueba que
+  se solicitan en el enunciado. En todas las pruebas se redirecciona la salida a un archivo para mostrar el contenido con el comando 'hexdump'.
+    \subsection{Prueba 1}
+    Invocaci\'on del programa con el archivo testdos.txt:
+      \newline	
+      \includegraphics[width=10cm, viewport=0 0 1018 324]{Imagenes/testdos.png}
+      \newline
+      En la figura se muestra la ejecucion primero del programa unix2dos y se redirecciona la salida al archivo 'salida\_dos.txt'. Luego el contenido
+      del archivo de salida se lo pasa por stdin al programa dos2unix, dando como salida un resultado identico al archivo original 'testdos.txt' como era 
+	de esperarse. 
+      \newline
+
+    \subsection{Prueba 2}
+    Invocaci\'on del programa "unix2dos" con el archivo "testLinux.txt":
+      \newline	
+      \includegraphics[width=10cm, viewport=0 0 1008 847]{Imagenes/testLinux.png}
+      \newline
+      \includegraphics[width=10cm, viewport=0 0 1005 882]{Imagenes/salidaLinux.png}
+      \newline
+Como se puede ver en las imagenes, la unica variacion entre la entrada y la salida son los caracteres de fin de linea.	
+      \newline
+
+    \subsection{Prueba 3}
+    Invocaci\'on del programa "dos2unix" con el archivo "testWindows.txt":
+      \newline	
+      \includegraphics[width=10cm, viewport=0 0 1018 864]{Imagenes/testWindows.png}
+      \newline
+      \includegraphics[width=10cm, viewport=0 0 987 882]{Imagenes/salidaWindows.png}
+      \newline
+	El contenido del archivo "testWindows.txt" es el mismo que "testLinux.txt" exceptuando al caracter fin de linea.
+	En este caso se puede ver que el resultado coincide con el contenido del archivo "testLinux.txt", mencionado en la Prueba 2.
+      \newline
+
 \newpage
 \section{Conclusiones}
   TODO
