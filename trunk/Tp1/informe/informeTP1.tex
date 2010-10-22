@@ -23,15 +23,15 @@
 
 \newpage
 \section{Introducci\'on}
-   En el presente trabajo pr\'actico se busc\'o  familiarizarse con el conjunto de instrucciones MIPS y el concepto de ABI. Para ello se implementaron dos programas completamente en assembly MIPS, que permiten convertir informaci\'on almacenada en streams de texto, para transformar archivos de texto de UNIX a DOS; y dos2unix para realizar la operacion inversa. Es decir, siguiendo la l\'inea de trabajo de los pr\'acticos anteriores, buscamos generar dos binarios diferentes en vez de un \'unico programa que resuelva ambos problemas.
+   En el presente trabajo pr\'actico se busc\'o  familiarizarse con el conjunto de instrucciones MIPS y el concepto de ABI. Para ello se implementaron dos programas completamente en assembly MIPS, que permiten convertir informaci\'on exclusivamente por stdin y stdout, para transformarla de UNIX a DOS y viceversa. Es decir, siguiendo la l\'inea de trabajo de los pr\'acticos anteriores, buscamos generar dos binarios diferentes en vez de un \'unico programa que resuelva ambos problemas.
 
 \section{Resoluci\'on del problema}
   Lo primero que se realiz\'o para cada funci\'on del programa, fue realizar su Stack Frame correspondiente.
   Para ellos se tuvo en cuentas los siguientes puntos: 
   \begin{itemize}
-    \item El Stack Frame se compone de areas de un tama\~no m\'ultiplo de 8 bytes, alineadas a 8 bytes.
-    \item Los registros en un area se almacenan de abajo hacia arriba, en orden seg\'un el n\'umero de registro.
-    \item Las areas son, en orden de aparici\'on (de arriba hacia abajo en memoria):
+    \item El Stack Frame se compone de \'areas de un tama\~no m\'ultiplo de 8 bytes, alineadas a 8 bytes.
+    \item Los registros en un \'area se almacenan de abajo hacia arriba, en orden seg\'un el n\'umero de registro.
+    \item Las \'areas son, en orden de aparici\'on (de arriba hacia abajo en memoria):
       \begin{enumerate}
 	  \item General Register Save Area[SRA] (obligatoria 3). Registros salvados:
 	    \begin{itemize}
@@ -46,30 +46,51 @@
 	    \begin{itemize}
 	      \item Se crea cuando la funci\'on es non-leaf;
 	      \item Al menos es de 16 bytes, a\'un cuando los argumentos del callee requieren menos.
-	      \item Cuando los cuatro primeros argumentos son enteros o punteros, se pasan en a0 a a3, y el resto se guarda en esta area a partir de los primeros 16 bytes.
-	      \item Los argumentos pasados en a0 a a3 son almacenados en esta area por el callee siempre
+	      \item Cuando los cuatro primeros argumentos son enteros o punteros, se pasan en a0 a a3, y el resto se guarda en esta \'area a partir de los primeros 16 bytes.
+	      \item Los argumentos pasados en a0 a a3 son almacenados en esta \'area por el callee siempre
 	    \end{itemize}
       \end{enumerate}
   \end{itemize}
   
-  A continuaci\'on se muestras los Stacks Frames.
+  A continuaci\'on se muestras los Stacks Frames de cada funci\'on de los programas.
 
   \subsection{Main}
     \subsubsection{Stack frame}
+    Los stacks frame de ambos programas son iguales, encontramos tres \'areas:
+    \begin{itemize}
+      \item SRA: Los registros salvados son: \$fp, gp y ra(por ser una funci\'on non-leaf). Es un \'area de 	      tama\~no de 16 bytes, como debe ser m\'ultiplo de 8 bytes se agrega align[4].
+      \item UA: Obligatoria, de 8 bytes.
+      \item ABA: Al ser una funci\'on non leaf necesita tres argumentos, por lo que el tama\~no es de 16 	      bytes(con align[4] para ser m\'ultiplo de 8 bytes). 
+    \end{itemize}
+    La diferencia se presenta en el contenido que poseen los registros FIN\_LINEA y FIN\_LINEA\_NUEVA, presentes en el \'area ABA. En el caso de unix2dos, FIN\_LINEA es \textbackslash n y FIN\_LINEA\_NUEVA \textbackslash r\textbackslash n.
       \begin{center}
 	\includegraphics[width=8cm, height=10cm]{DibujosStackFrame/stack-main.jpg}
       \end{center}
 
-  \subsection{Funci\'on conversor dos2unix}
-    \subsubsection{Stack frame dos2unix}
-      \begin{center}
-	\includegraphics[width=10cm, height=15cm]{DibujosStackFrame/stack-conversor-dos2unix.jpg}
-      \end{center}
-
   \subsection{Funci\'on conversor unix2dos}
+  El stack frame del conversor de unix2dos tiene cuatro \'areas:
+      \begin{itemize}
+      \item SRA: Los registros salvados son: \$fp, gp y ra. Es un \'area de tama\~no de 16 bytes.
+      \item LTA: Se utiliza tres variables locales, dos de 4 bytes(int) y una de 1 byte(char). Es un \'area de tama\~no de 16 bytes
+      \item UA: Obligatoria, de 8 bytes.
+      \item ABA: Al ser una funci\'on non leaf necesita tres argumentos como m\'aximo, por lo que el tama\~no es de 16 bytes. 
+    \end{itemize}
     \subsubsection{Stack frame unix2dos}
       \begin{center}
 	\includegraphics[width=10cm, height=15cm]{DibujosStackFrame/stack-conversor-unix2dos.jpg}
+      \end{center}
+
+  \subsection{Funci\'on conversor dos2unix}
+  El stack frame del conversor de dos2unix tiene cuatro \'areas:
+      \begin{itemize}
+      \item SRA: Los registros salvados son: \$fp, gp y ra. Es un \'area de tama\~no de 16 bytes.
+      \item LTA: Se utiliza tres variables locales, dos de 4 bytes(int) y dos de 1 byte(char). Es un \'area de tama\~no de 16 bytes
+      \item UA: Obligatoria, de 8 bytes.
+      \item ABA: Al ser una funci\'on non leaf necesita tres argumentos como m\'aximo, por lo que el tama\~no es de 16 bytes. 
+    \end{itemize}
+    \subsubsection{Stack frame dos2unix}
+      \begin{center}
+	\includegraphics[width=10cm, height=15cm]{DibujosStackFrame/stack-conversor-dos2unix.jpg}
       \end{center}
 
 \section{Preparando el ambiente para NetBSD}
@@ -114,34 +135,31 @@
   se solicitan en el enunciado. En todas las pruebas se redirecciona la salida a un archivo para mostrar el contenido con el comando 'hexdump'.
     \subsection{Prueba 1}
     Invocaci\'on del programa con el archivo testdos.txt:
-      \newline	
-      \includegraphics[width=10cm, viewport=0 0 1018 324]{Imagenes/testdos.png}
+    \begin{itemize}
+      \item En la figura se muestra la ejecuci\'on primero del programa unix2dos y se redirecciona la salida al 	archivo 'salida\_dos.txt'. Luego el contenido del archivo de salida se lo pasa por stdin al programa dos2unix, dando como salida un resultado identico al archivo original 'testdos.txt' como era de esperarse.
       \newline
-      En la figura se muestra la ejecucion primero del programa unix2dos y se redirecciona la salida al archivo 'salida\_dos.txt'. Luego el contenido
-      del archivo de salida se lo pasa por stdin al programa dos2unix, dando como salida un resultado identico al archivo original 'testdos.txt' como era 
-	de esperarse. 
-      \newline
+       \includegraphics[width=10cm, viewport=0 0 1018 324]{Imagenes/testdos.png}       
+    \end{itemize}
 
     \subsection{Prueba 2}
-    Invocaci\'on del programa "unix2dos" con el archivo "testLinux.txt":
-      \newline	
+    Invocaci\'on del programa unix2dos con el archivo testLinux.txt:
+    \begin{itemize}
+     \item Como se puede ver en las im\'agenes, la unica variaci\'on entre la entrada y la salida son los caracteres de fin de l\'inea.	
+     \newline
       \includegraphics[width=10cm, viewport=0 0 1008 847]{Imagenes/testLinux.png}
-      \newline
+     \newline
       \includegraphics[width=10cm, viewport=0 0 1005 882]{Imagenes/salidaLinux.png}
-      \newline
-Como se puede ver en las imagenes, la unica variacion entre la entrada y la salida son los caracteres de fin de linea.	
-      \newline
+    \end{itemize}
 
     \subsection{Prueba 3}
-    Invocaci\'on del programa "dos2unix" con el archivo "testWindows.txt":
-      \newline	
+    Invocaci\'on del programa dos2unix con el archivo testWindows.txt:
+    \begin{itemize}
+     \item El contenido del archivo testWindows.txt es el mismo que testLinux.txt exceptuando al caracter fin de l\'inea.En este caso se puede ver que el resultado coincide con el contenido del archivo testLinux.txt, mencionado en la Prueba 2.
+     \newline
       \includegraphics[width=10cm, viewport=0 0 1018 864]{Imagenes/testWindows.png}
-      \newline
+     \newline
       \includegraphics[width=10cm, viewport=0 0 987 882]{Imagenes/salidaWindows.png}
-      \newline
-	El contenido del archivo "testWindows.txt" es el mismo que "testLinux.txt" exceptuando al caracter fin de linea.
-	En este caso se puede ver que el resultado coincide con el contenido del archivo "testLinux.txt", mencionado en la Prueba 2.
-      \newline
+    \end{itemize}
 
 \newpage
 \section{Conclusiones}
