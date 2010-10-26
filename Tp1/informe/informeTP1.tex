@@ -79,7 +79,32 @@
       \begin{center}
 	\includegraphics[width=10cm, height=15cm]{DibujosStackFrame/stack-conversor-unix2dos.jpg}
       \end{center}
-
+    \subsubsection{Funcionamiento de unix2dos}
+    El funcionamiento de este programa se detallar\'a a continuaci\'on:
+      \begin{itemize}
+       \item Se crea el stack frame como se explic\'o en la subsecci\'on anterior.
+       \item Se cargan los par\'ametros necesarios para invocar a la funci\'on \textit{parser} respetando la {\bf ABI} para las llamadas a funciones.
+       \item Se invoca a la funci\'on \textit{parser}.
+	\begin{itemize}
+	\item La funci\'on \textit{parser} obtiene sus argumentos y crea su propio stack frame.
+	\item Verifica la cantidad de argumentos recibidos, devolviendo error en caso de que dicha cantidad no sea la esperada.
+	\item Obtiene el primer caracter mediante la llamada a la syscall \textit{Read}.
+	\item Se ingresa al \textit{$while-loop$} chequeandose las condiciones del mismo, es decir:
+	  \begin{itemize}
+	    \item Se verifica que el caracter le\'ido no sea EOF.
+	    \item Se verifica que no haya ocurrido un error al abrir el archivo de entrada(stdin en este caso).
+	    \item Se verifica si el valor de escritura es diferente de EOF.
+	  \end{itemize}
+	\item Se procede a verificar si se trata de un caracter de fin de l\'inea(\textbackslash n); y en caso de serlo, se procede a reemplazarlo por el caracter correspondiente (\textbackslash n  \textbackslash r).
+	\item Se escribe el caracter le\'ido mediante la syscall \textit{write} en el archivo de destino (stdout en este caso).
+	\item Se procede a leer el siguiente caracter.
+	\item Se libera el stack frame creado anteriormente y se devuelve el resultado utilizando la convenci\'on de la {\bf ABI} utilizada.
+	\end{itemize}
+       \item Se libera el stack frame creado por esta funci\'on.
+      \end{itemize}
+      {\bf Nota:} Se aclara que siempre que se crea un stack frame, luego el mismo es liberado por la misma funci\'on que lo cre\'o. As\'i como tambi\'en que los mismos
+      se crean siguiendo la convenci\'on dada por la {\bf ABI} utilizada, del mismo modo que se respeta lo enunciado por la misma para el pasaje de par\'ametros a una funci\'on y
+      retorno de resultados.
   \subsection{Funci\'on conversor dos2unix}
   El stack frame del conversor de dos2unix tiene cuatro \'areas:
       \begin{itemize}
@@ -92,7 +117,32 @@
       \begin{center}
 	\includegraphics[width=10cm, height=15cm]{DibujosStackFrame/stack-conversor-dos2unix.jpg}
       \end{center}
-
+    \subsubsection{Funcionamiento de dos2unix}
+    El funcionamiento de este programa se detallar\'a a continuaci\'on:
+      \begin{itemize}
+       \item Se crea el stack frame como se explic\'o en la subsecci\'on anterior.
+       \item Se cargan los par\'ametros necesarios para invocar a la funci\'on \textit{parser} respetando la {\bf ABI} para las llamadas a funciones.
+       \item Se invoca a la funci\'on \textit{parser}.
+	\begin{itemize}
+	\item La funci\'on \textit{parser} obtiene sus argumentos y crea su propio stack frame.
+	\item Verifica la cantidad de argumentos recibidos, devolviendo error en caso de que dicha cantidad no sea la esperada.
+	\item Obtiene el primer caracter mediante la llamada a la syscall \textit{Read}.
+	\item Se ingresa al \textit{$while-loop$} chequeandose las condiciones del mismo, es decir:
+	  \begin{itemize}
+	    \item Se verifica que el caracter le\'ido no sea EOF.
+	    \item Se verifica que no haya ocurrido un error al abrir el archivo de entrada(stdin en este caso).
+	    \item Se verifica si el valor de escritura es diferente de EOF.
+	  \end{itemize}
+	\item Se procede a verificar si se trata de un caracter de fin de l\'inea(\textbackslash n \textbackslash r); y en caso de serlo, se procede a reemplazarlo por el caracter correspondiente (\textbackslash n).
+	\item Se escribe el caracter le\'ido mediante la syscall \textit{write} en el archivo de destino (stdout en este caso).
+	\item Se procede a leer el siguiente caracter.
+	\item Se libera el stack frame creado anteriormente y se devuelve el resultado utilizando la convenci\'on de la {\bf ABI} utilizada.
+	\end{itemize}
+       \item Se libera el stack frame creado por esta funci\'on.
+      \end{itemize}
+      {\bf Nota:} Se aclara que siempre que se crea un stack frame, luego el mismo es liberado por la misma funci\'on que lo cre\'o. As\'i como tambi\'en que los mismos
+      se crean siguiendo la convenci\'on dada por la {\bf ABI} utilizada, del mismo modo que se respeta lo enunciado por la misma para el pasaje de par\'ametros a una funci\'on y
+      retorno de resultados.
 \section{Preparando el ambiente para NetBSD}
   Para probar el trabajo pr\'actico, lo primero que se debe realizar es enviar el c\'odigo assembly al entorno
   del NetBSD. Se considera que el NetBSD se encuentra corriendo y que se ha creado el loopback necesario. Para ello, se deben realizar los siguientes pasos:
