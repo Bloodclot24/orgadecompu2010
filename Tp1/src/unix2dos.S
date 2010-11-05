@@ -126,7 +126,7 @@ error_escritura:
 
 fin_conversor:
 	# Valor de retorno
-	lw	v0,24($fp)
+	lw	v0,28($fp)
 	
 	# Liberar stack frame
 	move	sp,$fp
