@@ -55,6 +55,10 @@ conversor:
 	syscall
 
 while_loop:
+	## Verifico errores de lectura
+	# Si a3 != 0
+	bne	a3,zero,error_lectura
+
 	## Condiciones de loop
 	# Verifico c == EOF
 	beq	v0,zero,fin_conversor		
@@ -81,6 +85,9 @@ while_loop:
 	li	a2,1
 	syscall	
 
+	# si a3 ( return value ) != 0 es un error
+	bne 	a3,zero,error_escritura
+
 	# Guardo val_escritura
 	sw	v0,24($fp)
 
@@ -101,6 +108,13 @@ verifico_si_es_fin_linea:
 	la	a1,33($fp)
 	li	a2,1	
 	syscall
+
+	## Verifico errores de lectura
+	# Si a3 != 0
+	bne	a3,zero,error_lectura
+	# Si cantidad de bytes leidos != 1 es un error
+	li	t0,1
+	bne     v0,t0,error_lectura
 
 	# Si el caracter que sigue completa el
 	# fin de linea
@@ -133,6 +147,9 @@ verifico_si_es_fin_linea:
 	li	a2,1
 	syscall
 
+	# si a3 ( return value ) != 0 es un error
+	bne 	a3,zero,error_escritura
+
 	# Guardo val_escritura
 	sw	v0,24($fp)
 	
@@ -149,6 +166,9 @@ cambiar_fin_linea:
 	move	a2,t0
 	syscall
 	
+	# si a3 ( return value ) != 0 es un error
+	bne 	a3,zero,error_escritura
+
 	# Guardo val_escritura
 	sw	v0,24($fp)	
 
