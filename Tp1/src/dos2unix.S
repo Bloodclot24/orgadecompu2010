@@ -101,6 +101,25 @@ leer_otro_caracter:
 
 	b	while_loop
 
+manejo_r_r:	#tengo en 32($fp) \r, 33($fp) \r
+	#escribo el 1er \r
+	li	v0,SYS_write
+	li	a0,1
+	la	a1,32($fp)
+	li	a2,1
+	syscall
+	
+	b verifico_si_es_fin_linea
+
+manejo_r_eof:
+	li	v0,SYS_write
+	li	a0,1
+	la	a1,32($fp)
+	li	a2,1
+	syscall
+
+	b fin_conversor
+
 verifico_si_es_fin_linea:
 	# Leo el siguiente caracter
 	li	v0,SYS_read
@@ -108,6 +127,8 @@ verifico_si_es_fin_linea:
 	la	a1,33($fp)
 	li	a2,1	
 	syscall
+
+	beq	v0,zero,manejo_r_eof	
 
 	## Verifico errores de lectura
 	# Si a3 != 0
@@ -123,7 +144,14 @@ verifico_si_es_fin_linea:
 	lb	t0,33($fp)
 	lb	t1,1(t1)
 	beq	t0,t1,cambiar_fin_linea
-	
+
+	# Si el caracter que sigue es \r (es decir, lei \r\r)
+	# c2 == finLinea[0]
+	lw	t1,60($fp)	
+	lb	t0,33($fp)
+	lb	t1,0(t1)
+	beq	t0,t1,manejo_r_r
+	 
 	# Escribo caracter1
 	li	v0,SYS_write
 	li	a0,1
